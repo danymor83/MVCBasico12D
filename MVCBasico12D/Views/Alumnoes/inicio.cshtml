@@ -1,0 +1,52 @@
+﻿@model MVCBasico12D.Models.Alumno
+
+@{
+    Layout = "";
+}
+
+@{
+    ViewData["Title"] = "Inicio";
+}
+
+<head>
+    <title>Inicio</title>
+    <link rel="stylesheet" href="~/css/inicio.css">
+</head>
+<body>
+    <h1>Bienvenido @Html.DisplayFor(model => model.Nombre)!</h1>
+    <ul>
+        <li><a href="#">Inicio</a></li>
+        <li class="dropdown">
+            <a href="javascript:void(0)" class="dropbtn">Materias</a>
+            <div class="dropdown-content">
+                <form asp-action="paginaMateria" id="page" method="post">
+                    @if (ViewBag.Materias != null)
+                    {
+                        @foreach (var nw in ViewBag.Materias)
+                        {
+                            <a class="nav-link text-dark" id="@nw" onclick="pageMateria(this.id)">@nw</a>
+                        }
+                        <input asp-for="Id" id="alumnoId" type="hidden" value=@Model.Id class="form-control" />
+                        <input asp-for="Nombre" id="materiaId" type="hidden" class="form-control" />
+                    }
+                </form>
+            </div>
+        </li>
+        <form asp-action="Notas" id="pageAlumno">
+            <li><a href="#" onclick="pageAlumno()">Calificaciones</a></li>
+            <input asp-for="Id" id="alumnoId" type="hidden" value=@Model.Id class="form-control" />
+        </form>
+        <li id="Salir"><a id="salir" href="#" onclick="salir()">Salir</a></li>
+    </ul>
+    <script src="~/js/site.js"></script>
+    <script>
+        function pageMateria(id) {
+            document.getElementById("materiaId").value = id;
+            document.getElementById("page").submit();
+        }
+
+        function pageAlumno() {
+            document.getElementById("pageAlumno").submit();
+        }
+    </script>
+</body>

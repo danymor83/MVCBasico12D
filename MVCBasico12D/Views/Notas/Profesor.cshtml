@@ -1,0 +1,162 @@
+﻿@model MVCBasico12D.Models.Nota
+
+@{
+    Layout = "";
+}
+
+@{
+    ViewData["Title"] = "Inicio";
+}
+
+<head>
+    <title>Inicio</title>
+    <link rel="stylesheet" href="~/css/inicio.css">
+    <link rel="stylesheet" href="~/css/notas.css">
+</head>
+<body>
+    <ul>
+        <form asp-action="InicioProfesor" id="pageProfesor">
+            <li><a href="#" onclick="pageProfesor()">Volver</a></li>
+            <input asp-for="AlumnoId" id="profesorId" type="hidden" value=@ViewBag.Profesor.Id class="form-control" />
+        </form>
+        <li id="Salir"><a id="salir" href="#" onclick="salir()">Salir</a></li>
+    </ul>
+
+    <div class="container">
+        <div id="table" class="table-editable">
+        <span class="table-add glyphicon glyphicon-plus"></span>
+        <div class="container">
+            <div id="table" class="table-editable">
+                <span class="table-add glyphicon glyphicon-plus"></span>
+                @foreach (Curso curso in ViewBag.Cursos)
+                {
+                    <label>@curso.Sigla</label>
+                    <table class="table">
+                        <tr>
+                            <th>Alumno</th>
+                            <th>1° cuatrimestre</th>
+                            <th>2° cuatrimestre</th>
+                            <th>3° cuatrimestre</th>
+                            <th>Nota final</th>
+                        </tr>
+                        @foreach (Alumno alumno in ViewBag.Alumnos)
+                        {
+                            bool pertenece = false;
+                            @foreach (CursoAlumno ca in ViewBag.CursoAlumnos)
+                            {
+                                if (ca.AlumnoId == alumno.Id && ca.CursoId == curso.Id)
+                                {
+                                    pertenece = true;
+                                }
+                            }
+                            if (pertenece)
+                            {
+                                int cont = 0;
+                                int prom = 0;
+                                <tr>
+                                    <td contenteditable="false">@alumno.Apellido , @alumno.Nombre</td>
+                                    @foreach (Nota n in ViewBag.Notas)
+                                    {
+                                        if (alumno.Id == n.AlumnoId && ViewBag.Materia.Id == n.MateriaId)
+                                        {
+                                            <td contenteditable="false">@n.Nota1</td>
+                                            prom += n.Nota1;
+                                            cont++;
+                                        }
+                                    }
+                                    @if(cont < 3)
+                                    {
+                                        for(int i = cont; i < 3; i++)
+                                        {
+                                            <td contenteditable="false">0</td>
+                                        }
+                                    }
+
+                                    <td contenteditable="false">@(prom/3)</td>
+                                </tr>
+                            }
+                        }
+                    </table>
+                    <br />
+                }
+
+            </div>
+
+
+            @foreach (Curso curso in ViewBag.Cursos)
+            {
+        <form asp-action="ActualizarNota" id=@curso.Id>
+            <label>@curso.Sigla</label>
+            <select name="alumnos" id="alumnos">
+                @foreach (Alumno alumno in ViewBag.Alumnos)
+                {
+                    bool pertenece = false;
+                    @foreach (CursoAlumno ca in ViewBag.CursoAlumnos)
+                    {
+                        if (ca.AlumnoId == alumno.Id && ca.CursoId == curso.Id)
+                        {
+                            pertenece = true;
+                        }
+                    }
+                    if (pertenece)
+                    {
+                        <option value=@alumno.Id>
+                            @alumno.Apellido , @alumno.Nombre
+                        </option>
+                    }
+                }
+            </select>
+            <select name="cuatrimestres" id="cuatrimestres">
+                <option value=1>1</option>
+                <option value=2>2</option>
+                <option value=3>3</option>
+            </select>
+            <input asp-for="Nota1" id="nota1" type="number" placeholder="Nota" class="form-control" />
+            <input asp-for="Id" id="profesorId" type="hidden" value=@ViewBag.Profesor.Id class="form-control" />
+            <input asp-for="Cuatrimestre" id="cuatrimestre" type="hidden" class="form-control" />
+            <input asp-for="AlumnoId" id="alumnoId" type="hidden" class="form-control" />
+            <input asp-for="MateriaId" id="materiaId" type="hidden" value=@ViewBag.Materia.Id class="form-control" />
+            <input type="submit" value="Actualizar" onclick="actualizar(@curso.Id)" class="btn btn-primary" />
+        </form>
+                    <br />
+                    }
+            </div>
+    </div>
+
+    <script src="~/js/site.js"></script>
+    <script>
+        function pageMateria(id) {
+            document.getElementById("materiaId").value = id;
+            document.getElementById("page").submit();
+        }
+        function pageProfesor() {
+            document.getElementById("pageProfesor").submit();
+        }
+        function actualizar(id) {
+            alert(id);
+            form = document.getElementById(id);
+            var cuatri;
+            var alumId;
+            for (i = 0; i < form.childNodes.length; i++) {
+                oChild = form.childNodes[i];
+                if (oChild.id == "cuatrimestres") {
+                    cuatri = oChild.value;
+                }
+                if (oChild.id == "alumnos") {
+                    alumId = oChild.value;
+                }
+            }
+            alert(cuatri);
+            alert(alumId);
+            for (i = 0; i < form.childNodes.length; i++) {
+                oChild = form.childNodes[i];
+                if (oChild.id == "cuatrimestre") {
+                    oChild.value = cuatri;
+                }
+                if (oChild.id == "alumnoId") {
+                    oChild.value = alumId;
+                }
+            }
+        }
+    </script>
+</body>

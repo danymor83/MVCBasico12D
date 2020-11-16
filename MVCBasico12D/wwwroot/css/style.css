@@ -1,0 +1,30 @@
+﻿.container {
+    width: 30%;
+    margin: auto;
+    overflow: hidden;
+    margin-top: 1%;
+}
+
+h1 {
+    color: grey;
+    font-family: cursive;
+    text-align: center;
+}
+
+.ingreso {
+    background-color: grey;
+    text-align: right;
+    color: white;
+}
+
+#labelC {
+    padding-left: 2.5%;
+}
+
+#miclave {
+    margin-right: 2%;
+}
+
+#btnAcceder {
+    margin-right: 2%;
+}

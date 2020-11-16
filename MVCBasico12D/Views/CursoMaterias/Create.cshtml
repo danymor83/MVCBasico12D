@@ -1,0 +1,43 @@
+﻿@model MVCBasico12D.Models.CursoMateria
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>CursoMateria</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        @*Formulario que agarra el ID de la materia y el Id del curso y lo manda al Action Create de CursosMaterias*@
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label>Materia</label>
+                @Html.DropDownList("materias",
+        new SelectList(ViewBag.Materias))
+                <input asp-for="MateriaId" id="materiaId" type="hidden" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label>Curso</label>
+                @Html.DropDownList("cursos",
+                     new SelectList(ViewBag.Cursos))
+                <input asp-for="CursoId" id="sigla" type="hidden" class="form-control" />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Asignar" onclick="asignarMateria()" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="~/js/site.js"></script>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
