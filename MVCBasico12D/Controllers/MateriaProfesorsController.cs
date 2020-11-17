@@ -47,11 +47,34 @@ namespace MVCBasico12D.Controllers
         public IActionResult Create()
         {
             var profesores = (from p in _context.Profesor
-                           select new { p.Dni, p.Nombre, p.Apellido }).ToList();
+                           select p).ToList();
+            List<Profesor> profesSinMateria = new List<Profesor>();
+            foreach(Profesor p in profesores)
+            {
+                MateriaProfesor profe = null;
+                profe = _context.MateriaProfesor.Where(m => m.ProfesorId == p.Id)
+                 .FirstOrDefault();
+                if(profe == null)
+                {
+                    profesSinMateria.Add(p);
+                }
+            }
             var materias = (from m in _context.Materia
-                          select new { m.Id, m.Nombre, m.Anio}).ToList();
-            ViewBag.Profesores = profesores;
-            ViewBag.Materias = materias;
+                            orderby m.Nombre ascending
+                          select m).ToList();
+            List<Materia> materiasSinProfe = new List<Materia>();
+            foreach(Materia m in materias)
+            {
+                MateriaProfesor mate = null;
+                mate = _context.MateriaProfesor.Where(x => x.MateriaId == m.Id)
+                 .FirstOrDefault();
+                if (mate == null)
+                {
+                    materiasSinProfe.Add(m);
+                }
+            }
+            ViewBag.Profesores = profesSinMateria;
+            ViewBag.Materias = materiasSinProfe;
             return View();
         }
 
@@ -64,14 +87,6 @@ namespace MVCBasico12D.Controllers
         {
             if (ModelState.IsValid)
             {
-                //Con el DNI del profesor, busco su ID y lo asigno al ProfesorID de materiaProfesor
-                string dni = materiaProfesor.ProfesorId.ToString();
-                var idProfesor = (from p in _context.Profesor
-                                where p.Dni == dni
-                                select p.Id).FirstOrDefault();
-
-                materiaProfesor.ProfesorId = idProfesor;
-
                 //Inserto el nuevo materiaProfesor en la BD
                 _context.Add(materiaProfesor);
                 await _context.SaveChangesAsync();

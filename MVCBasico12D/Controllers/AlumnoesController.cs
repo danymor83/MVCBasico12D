@@ -99,6 +99,7 @@ namespace MVCBasico12D.Controllers
         // GET: Alumnoes/Create
         public IActionResult Create()
         {
+            ViewBag.Erro = "display: none;";
             return View();
         }
 
@@ -111,16 +112,21 @@ namespace MVCBasico12D.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(alumno);
-                await _context.SaveChangesAsync();
-                Usuario user = new Usuario();
-                user.Tipo = 1;
-                user.Login = alumno.Dni;
-                user.Password = alumno.Nombre.ToLower();
-                _context.Add(user);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                var alum = _context.Usuarios.Where(x => x.Login == alumno.Dni).FirstOrDefault();
+                if(alum == null)
+                {
+                    _context.Add(alumno);
+                    await _context.SaveChangesAsync();
+                    Usuario user = new Usuario();
+                    user.Tipo = 1;
+                    user.Login = alumno.Dni;
+                    user.Password = alumno.Nombre.ToLower();
+                    _context.Add(user);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
             }
+            ViewBag.Erro = "display: inline; color:red;";
             return View(alumno);
         }
 
@@ -138,6 +144,7 @@ namespace MVCBasico12D.Controllers
             {
                 return NotFound();
             }
+            ViewBag.Erro = "display: none;";
             return View(alumno);
         }
 
@@ -157,8 +164,12 @@ namespace MVCBasico12D.Controllers
             {
                 try
                 {
-                    _context.Update(alumno);
-                    await _context.SaveChangesAsync();
+                    var alum = _context.Usuarios.Where(x => x.Login == alumno.Dni).FirstOrDefault();                    
+                    if(alum == null || alum.Login == alumno.Dni)
+                    {
+                        _context.Update(alumno);
+                        await _context.SaveChangesAsync();
+                    }
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -173,6 +184,7 @@ namespace MVCBasico12D.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            ViewBag.Erro = "display: inline; color:red;";
             return View(alumno);
         }
 
@@ -199,7 +211,22 @@ namespace MVCBasico12D.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            //Busca las notas del alumno y las borra
+            var notas = _context.Nota.Where(x => x.AlumnoId == id).ToList();
+            if(notas != null)
+            {
+                _context.Nota.RemoveRange(notas);
+            }            
+            //Busca la relacion del alumno con su curso y lo borra
+            var cursoAlumno = _context.CursoAlumno.Where(x => x.AlumnoId == id).FirstOrDefault();
+            if(cursoAlumno != null)
+            {
+                _context.CursoAlumno.Remove(cursoAlumno);
+            }            
+            //Busca al alumno y lo borra de la tabla de alumnos y de la tabla de usuarios
             var alumno = await _context.Alumno.FindAsync(id);
+            var alumnoUser = _context.Usuarios.Where(x => x.Login == alumno.Dni).FirstOrDefault();
+            _context.Usuarios.Remove(alumnoUser);
             _context.Alumno.Remove(alumno);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));

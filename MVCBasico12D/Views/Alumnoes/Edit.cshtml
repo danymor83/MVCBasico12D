@@ -15,41 +15,43 @@
             <input type="hidden" asp-for="Id" />
             <div class="form-group">
                 <label asp-for="Nombre" class="control-label"></label>
-                <input asp-for="Nombre" class="form-control" />
+                <input asp-for="Nombre" class="form-control" required/>
                 <span asp-validation-for="Nombre" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Apellido" class="control-label"></label>
-                <input asp-for="Apellido" class="form-control" />
+                <input asp-for="Apellido" class="form-control" required/>
                 <span asp-validation-for="Apellido" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Dni" class="control-label"></label>
-                <input asp-for="Dni" class="form-control" />
+                <input asp-for="Dni" id="dni" type="text" required minlength="8" maxlength="8" class="form-control" />
                 <span asp-validation-for="Dni" class="text-danger"></span>
+                <label style="@ViewBag.Erro">DNI ya existe!</label>
             </div>
             <div class="form-group">
                 <label asp-for="FechaNacimiento" class="control-label"></label>
-                <input asp-for="FechaNacimiento" class="form-control" />
+                <input asp-for="FechaNacimiento" type="date" placeholder="dd-mm-yyyy" min="01-01-1900" max="31-12-2014" id="fechaNa" class="form-control" required/>
                 <span asp-validation-for="FechaNacimiento" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Email" class="control-label"></label>
-                <input asp-for="Email" class="form-control" />
+                <input asp-for="Email" id="email" type="email" class="form-control" required/>
                 <span asp-validation-for="Email" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Telefono" class="control-label"></label>
-                <input asp-for="Telefono" class="form-control" />
+                <input asp-for="Telefono" id="telefono" type="text" required minlength="8" maxlength="8" class="form-control" />
                 <span asp-validation-for="Telefono" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Guardar" class="btn btn-primary" />
+                <input type="submit" value="Guardar" onclick="return validarFormPersona()" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
 
+<script src="~/js/site.js"></script>
 <div>
     <a asp-action="Index">Volver a la lista</a>
 </div>

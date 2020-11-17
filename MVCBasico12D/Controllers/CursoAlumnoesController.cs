@@ -47,10 +47,21 @@ namespace MVCBasico12D.Controllers
         public IActionResult Create()
         {
             var alumnos = (from a in _context.Alumno
-                              select new { a.Dni, a.Nombre, a.Apellido }).ToList();
+                              select a).ToList();
+            List<Alumno> alumnosSinCurso = new List<Alumno>();
             var cursos = (from c in _context.Curso
-                             select new {c.Id, c.Sigla }).ToList();
-            ViewBag.Alumnos = alumnos;
+                             select c).ToList();
+
+            foreach (Alumno a in alumnos) {
+                var cursoAlumno = _context.CursoAlumno.Where(m => m.AlumnoId == a.Id)
+                 .FirstOrDefault();
+                if(cursoAlumno == null)
+                {
+                    alumnosSinCurso.Add(a);
+                }
+            }
+
+            ViewBag.Alumnos = alumnosSinCurso;
             ViewBag.Cursos = cursos;
             return View();
         }
@@ -65,14 +76,6 @@ namespace MVCBasico12D.Controllers
         {
             if (ModelState.IsValid)
             {
-                //Con el DNI del alumno, busco su ID y lo asigno al AlumnoID de cursoAlumno
-                string dni = cursoAlumno.AlumnoId.ToString();
-                var idAlumno = (from a in _context.Alumno
-                              where a.Dni == dni
-                              select a.Id).FirstOrDefault();
-
-                cursoAlumno.AlumnoId = idAlumno;
-
                 //Inserto el nuevo cursoAlumno en la BD
                 _context.Add(cursoAlumno);
                 await _context.SaveChangesAsync();

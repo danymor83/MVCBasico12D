@@ -75,9 +75,13 @@ namespace MVCBasico12D.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(curso);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                var curs = _context.Curso.Where(x => x.Sigla == curso.Sigla).FirstOrDefault();
+                if (curs == null)
+                {
+                    _context.Add(curso);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }                
             }
             return View(curso);
         }
@@ -156,6 +160,19 @@ namespace MVCBasico12D.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            //Busca todos los alumnos del curso y borra sus relaciones
+            var cursoAlumnos = _context.CursoAlumno.Where(x => x.CursoId == id).ToList();
+            if(cursoAlumnos != null)
+            {
+                _context.CursoAlumno.RemoveRange(cursoAlumnos);
+            }            
+            //Busca todas las materias del curso y borra sus relaciones
+            var cursoMaterias = _context.CursoMateria.Where(x => x.CursoId == id).ToList();
+            if(cursoMaterias != null)
+            {
+                _context.CursoMateria.RemoveRange(cursoMaterias);
+            }            
+            //Busca el curso y lo borra
             var curso = await _context.Curso.FindAsync(id);
             _context.Curso.Remove(curso);
             await _context.SaveChangesAsync();

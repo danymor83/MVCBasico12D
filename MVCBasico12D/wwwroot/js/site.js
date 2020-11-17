@@ -7,59 +7,72 @@ function salir() {
     }
 }
 
-//Agarra el valor seleccionado de la lista de alumnos y asgina el DNI como valor del Input que lo envia al controller
-function dniAlumno() {
-    const dni = document.getElementById("alumnos").value.substring(8,16);
-    document.getElementById("dni").value = dni;
-    console.log(dni);
-}
-
-//Agarra el valor seleccionado de la lista de profesores y asgina el DNI como valor del Input que lo envia al controller
-function dniProfesor() {
-    const dni = document.getElementById("profesores").value.substring(8, 16);
-    document.getElementById("dni").value = dni;
-    console.log(dni);
-}
-
-//Agarra el valor seleccionado de la lista de cursos y asgina el ID como valor del Input que lo envia al controller
-function siglaCurso() {
-    const sigla = document.getElementById("cursos").value.substring(7, 8);
-    if (!(document.getElementById("cursos").value.substring(8, 9) === ",")) {
-        sigla = document.getElementById("cursos").value.substring(7, 9);
-    }
-    document.getElementById("sigla").value = sigla;
-    console.log(sigla);
-}
-
-//Agarra el valor seleccionado de la lista de materias y asgina el ID como valor del Input que lo envia al controller
-function idMateria() {
-    const id = document.getElementById("materias").value.substring(7, 8);
-    if (!(document.getElementById("materias").value.substring(8, 9) === ",")) {
-        id = document.getElementById("materias").value.substring(7, 9);
-    }
-    document.getElementById("materiaId").value = id;
-    console.log(id);
-}
-
 function asignarAlumno() {
-    dniAlumno();
-    siglaCurso();
+    const alumnoId = document.getElementById("alumnos").value;
+    document.getElementById("alumnoId").value = alumnoId;
+    const cursoId = document.getElementById("cursos").value;
+    document.getElementById("cursoId").value = cursoId;
 }
 
 function asignarMateria() {
-    idMateria();
-    siglaCurso();
+    const materiaId = document.getElementById("materias").value;
+    document.getElementById("materiaId").value = materiaId;
+    const cursoId = document.getElementById("cursos").value;
+    document.getElementById("cursoId").value = cursoId;
 }
 
 function asignarProfesor() {
-    dniProfesor();
-    idMateria();
+    const profesorId = document.getElementById("profesores").value;
+    document.getElementById("profesorId").value = profesorId;
+    const materiaId = document.getElementById("materias").value;
+    document.getElementById("materiaId").value = materiaId;
 }
 
 
-//Line 20: , new { onchange = "dniAlumno()" }
-//Line 26: , new { onchange = "siglaCurso()" }
-//, new { onchange = "idMateria()" }
-//, new { onchange = "siglaCurso()" }
-//, new { onchange = "dniProfesor()" }
-//, new { onchange = "idMateria()" }
+function validarFecha() {
+    var fecha = document.getElementById("fechaNa").value;
+    var partes = fecha.split("-");
+    var date = new Date(partes[0] + "-" + partes[1] + "-" + partes[2]);
+    var dataHoy = new Date();
+    if (dataHoy.getFullYear() - date.getFullYear() < 6 || dataHoy.getFullYear() - date.getFullYear() > 100) {
+        alert("Fecha de nacimiento invalida!");
+        document.getElementById("fechaNa").focus();
+        return false;
+    }
+    return true;
+}
+
+function validateEmail() {
+    var email = document.getElementById("email").value;
+    if (/\S+@\S+\.\S+/.test(email)) {
+        return true;
+    }
+    alert("Email inválido!")
+    return false;
+}
+
+function validarDni() {
+    var dni = document.getElementById("dni").value;
+    if (/^[0-9]{8,8}/.test(dni)) {
+        return true;
+    }
+    alert("DNI inválido!")
+    return false;
+}
+
+function validarTelefono() {
+    var dni = document.getElementById("telefono").value;
+    if (/^[0-9]{8,8}/.test(dni)) {
+        return true;
+    }
+    alert("Telefono inválido!")
+    return false;
+}
+
+function validarFormPersona() {
+    if (validarFecha() && validateEmail() && validarDni() && validarTelefono()) {
+        return true;
+    }
+    return false;
+
+}

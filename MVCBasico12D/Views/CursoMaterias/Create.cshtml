@@ -15,15 +15,29 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label>Materia</label>
-                @Html.DropDownList("materias",
-        new SelectList(ViewBag.Materias))
+                <select id="materias">
+                    @if (ViewBag.Materias != null)
+                    {
+                        foreach (Materia m in ViewBag.Materias)
+                        {
+                            <option value=@m.Id>@m.Nombre, @m.Anio</option>
+                        }
+                    }
+                </select>
                 <input asp-for="MateriaId" id="materiaId" type="hidden" class="form-control" />
             </div>
             <div class="form-group">
                 <label>Curso</label>
-                @Html.DropDownList("cursos",
-                     new SelectList(ViewBag.Cursos))
-                <input asp-for="CursoId" id="sigla" type="hidden" class="form-control" />
+                <select id="cursos">
+                    @if (ViewBag.Cursos != null)
+                    {
+                        foreach (Curso c in ViewBag.Cursos)
+                        {
+                            <option value=@c.Id>@c.Sigla</option>
+                        }
+                    }
+                </select>
+                <input asp-for="CursoId" id="cursoId" type="hidden" class="form-control" />
             </div>
             <div class="form-group">
                 <input type="submit" value="Asignar" onclick="asignarMateria()" class="btn btn-primary" />

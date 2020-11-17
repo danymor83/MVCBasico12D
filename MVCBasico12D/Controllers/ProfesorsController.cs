@@ -102,6 +102,7 @@ namespace MVCBasico12D.Controllers
         // GET: Profesors/Create
         public IActionResult Create()
         {
+            ViewBag.Erro = "display: none;";
             return View();
         }
 
@@ -114,16 +115,21 @@ namespace MVCBasico12D.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(profesor);
-                await _context.SaveChangesAsync();
-                Usuario user = new Usuario();
-                user.Tipo = 2;
-                user.Login = profesor.Dni;
-                user.Password = profesor.Nombre.ToLower();
-                _context.Add(user);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                var profe = _context.Usuarios.Where(x => x.Login == profesor.Dni).FirstOrDefault();
+                if(profe == null)
+                {
+                    _context.Add(profesor);
+                    await _context.SaveChangesAsync();
+                    Usuario user = new Usuario();
+                    user.Tipo = 2;
+                    user.Login = profesor.Dni;
+                    user.Password = profesor.Nombre.ToLower();
+                    _context.Add(user);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }                
             }
+            ViewBag.Erro = "display: inline; color:red;";
             return View(profesor);
         }
 
@@ -140,6 +146,7 @@ namespace MVCBasico12D.Controllers
             {
                 return NotFound();
             }
+            ViewBag.Erro = "display: none;";
             return View(profesor);
         }
 
@@ -159,8 +166,12 @@ namespace MVCBasico12D.Controllers
             {
                 try
                 {
-                    _context.Update(profesor);
-                    await _context.SaveChangesAsync();
+                    var profe = _context.Usuarios.Where(x => x.Login == profesor.Dni).FirstOrDefault();
+                    if (profe == null || profe.Login == profesor.Dni)
+                    {
+                        _context.Update(profesor);
+                        await _context.SaveChangesAsync();
+                    }                    
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -175,6 +186,7 @@ namespace MVCBasico12D.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            ViewBag.Erro = "display: inline; color:red;";
             return View(profesor);
         }
 
@@ -201,7 +213,16 @@ namespace MVCBasico12D.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            //Busca la relacion del profesor con su materia y lo borra
+            var materiaProfesor = _context.MateriaProfesor.Where(x => x.ProfesorId == id).FirstOrDefault();
+            if(materiaProfesor != null)
+            {
+                _context.MateriaProfesor.Remove(materiaProfesor);
+            }                
+            //Buscar al profesor y lo borra de la tabla de profesores y de la tabla de usuarios
             var profesor = await _context.Profesor.FindAsync(id);
+            var profesorUser = _context.Usuarios.Where(x => x.Login == profesor.Dni).FirstOrDefault();
+            _context.Usuarios.Remove(profesorUser);
             _context.Profesor.Remove(profesor);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));

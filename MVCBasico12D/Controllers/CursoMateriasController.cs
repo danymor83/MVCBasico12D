@@ -47,9 +47,11 @@ namespace MVCBasico12D.Controllers
         public IActionResult Create()
         {
             var materias = (from m in _context.Materia
-                           select new { m.Id, m.Nombre, m.Anio}).ToList();
+                            orderby m.Nombre ascending
+                            select m).ToList();
             var cursos = (from c in _context.Curso
-                          select new { c.Id, c.Sigla }).ToList();
+                          orderby c.Sigla ascending
+                          select c).ToList();
             ViewBag.Materias = materias;
             ViewBag.Cursos = cursos;
             return View();
@@ -64,9 +66,13 @@ namespace MVCBasico12D.Controllers
         {
            if (ModelState.IsValid)
             {
-                _context.Add(cursoMateria);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                var cursoMat = _context.CursoMateria.Where(x => x.CursoId == cursoMateria.CursoId && x.MateriaId == cursoMateria.MateriaId).FirstOrDefault();
+                if(cursoMat == null)
+                {
+                    _context.Add(cursoMateria);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }               
             }
             return View(cursoMateria);
         }

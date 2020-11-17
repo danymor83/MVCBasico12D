@@ -62,12 +62,16 @@ namespace MVCBasico12D.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Nombre,Anio")] Materia materia)
-        {
+        {            
             if (ModelState.IsValid)
             {
-                _context.Add(materia);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                var mat = _context.Materia.Where(x => x.Nombre == materia.Nombre && x.Anio == materia.Anio).FirstOrDefault();
+                if (mat == null)
+                {
+                    _context.Add(materia);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }                
             }
             return View(materia);
         }
@@ -146,6 +150,19 @@ namespace MVCBasico12D.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            //Busca las materias del curso y borra sus relaciones
+            var cursoMaterias = _context.CursoMateria.Where(x => x.MateriaId == id).ToList();
+            if(cursoMaterias != null)
+            {
+                _context.CursoMateria.RemoveRange(cursoMaterias);
+            }           
+            //Busca la relacion entre profesor y materia y lo borra
+            var materiasProfesor = _context.MateriaProfesor.Where(x => x.MateriaId == id).FirstOrDefault();
+            if(materiasProfesor != null)
+            {
+                _context.MateriaProfesor.Remove(materiasProfesor);
+            }            
+            //Busca la materia y la borra
             var materia = await _context.Materia.FindAsync(id);
             _context.Materia.Remove(materia);
             await _context.SaveChangesAsync();

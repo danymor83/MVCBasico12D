@@ -43,20 +43,19 @@
                             <td contenteditable="false">@mat.Nombre</td>
                             @foreach (Nota n in ViewBag.Notas)
                             {
-                                if (cont < 3)
+                                if (mat.Id == n.MateriaId)
                                 {
-                                    if (mat.Id == n.MateriaId)
-                                    {
-                                        <td contenteditable="false">@n.Nota1</td>
-                                        prom += n.Nota1;
-                                    }
-                                    else
-                                    {
-                                        <td contenteditable="false">0</td>
-                                    }
+                                    <td contenteditable="false">@n.Nota1</td>
+                                    prom += n.Nota1;
                                     cont++;
                                 }
-
+                            }
+                            @if (cont < 3)
+                            {
+                                for(int i = cont; i < 3; i++)
+                                {
+                                    <td contenteditable="false">-</td>
+                                }
                             }
                             <td contenteditable="false">@(prom/3)</td>
                         </tr>

@@ -97,6 +97,7 @@ namespace MVCBasico12D.Controllers
                                 join al in _context.Alumno on n.AlumnoId equals al.Id
                                 where n.MateriaId == materia.Id
                                  orderby n.AlumnoId ascending
+                                 orderby n.Cuatrimestre ascending
                                  select n).ToList();
             ViewBag.Notas = notas;
             return View();
