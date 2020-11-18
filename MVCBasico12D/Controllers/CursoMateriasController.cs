@@ -22,6 +22,36 @@ namespace MVCBasico12D.Controllers
         // GET: CursoMaterias
         public async Task<IActionResult> Index()
         {
+            var cursos = (from c in _context.Curso
+                          orderby c.Sigla ascending
+                          select c).ToList();
+            var materias = (from m in _context.Materia
+                           orderby m.Nombre ascending
+                           select m).ToList();
+            var cursosMaterias = (from cm in _context.CursoMateria
+                                 select cm).ToList();
+            List<Materia> materiasConCurso = new List<Materia>();
+            foreach (Materia materia in materias)
+            {
+                bool pertenece = false;
+                int i = 0;
+                while (i < cursos.Count && !pertenece)
+                {
+                    int j = 0;
+                    while (j < cursosMaterias.Count && !pertenece)
+                    {
+                        if (materia.Id == cursosMaterias.ElementAt(j).MateriaId && cursos.ElementAt(i).Id == cursosMaterias.ElementAt(j).CursoId)
+                        {
+                            materiasConCurso.Add(materia);
+                            pertenece = true;
+                        }
+                        j++;
+                    }
+                    i++;
+                }
+            }
+            ViewBag.Materias = materiasConCurso;
+            ViewBag.Cursos = cursos;
             return View(await _context.CursoMateria.ToListAsync());
         }
 
@@ -54,6 +84,7 @@ namespace MVCBasico12D.Controllers
                           select c).ToList();
             ViewBag.Materias = materias;
             ViewBag.Cursos = cursos;
+            ViewBag.Erro = "display: none;";
             return View();
         }
 
@@ -74,6 +105,15 @@ namespace MVCBasico12D.Controllers
                     return RedirectToAction(nameof(Index));
                 }               
             }
+            var materias = (from m in _context.Materia
+                            orderby m.Nombre ascending
+                            select m).ToList();
+            var cursos = (from c in _context.Curso
+                          orderby c.Sigla ascending
+                          select c).ToList();
+            ViewBag.Materias = materias;
+            ViewBag.Cursos = cursos;
+            ViewBag.Erro = "display: inline; color:red;";
             return View(cursoMateria);
         }
 
@@ -90,6 +130,12 @@ namespace MVCBasico12D.Controllers
             {
                 return NotFound();
             }
+            var materia = _context.Materia.Where(x => x.Id == cursoMateria.MateriaId).FirstOrDefault();
+            var cursos = (from c in _context.Curso
+                          select c).ToList();
+            ViewBag.Materia = materia;
+            ViewBag.Curso = cursos;
+            ViewBag.Erro = "display: none;";
             return View(cursoMateria);
         }
 
@@ -109,8 +155,13 @@ namespace MVCBasico12D.Controllers
             {
                 try
                 {
-                    _context.Update(cursoMateria);
-                    await _context.SaveChangesAsync();
+                    var cursoMat = _context.CursoMateria.Where(x => x.CursoId == cursoMateria.CursoId && x.MateriaId == cursoMateria.MateriaId).FirstOrDefault();
+                    if(cursoMat == null)
+                    {
+                        _context.Update(cursoMateria);
+                        await _context.SaveChangesAsync();
+                        return RedirectToAction(nameof(Index));
+                    }                    
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -122,20 +173,25 @@ namespace MVCBasico12D.Controllers
                     {
                         throw;
                     }
-                }
-                return RedirectToAction(nameof(Index));
+                }                
             }
+            var materia = _context.Materia.Where(x => x.Id == cursoMateria.MateriaId).FirstOrDefault();
+            var cursos = (from c in _context.Curso
+                          select c).ToList();
+            ViewBag.Materia = materia;
+            ViewBag.Curso = cursos;
+            ViewBag.Erro = "display: inline; color:red;";
             return View(cursoMateria);
         }
 
         public async Task<IActionResult> Remover(int materiaId, int cursoId)
         {
-            //Busco el ID del cursoMateria que deseo eliminar, usando el ID de la materia y el ID del curso
-            var idEliminar = (from cm in _context.CursoMateria
-                              where cm.MateriaId == materiaId && cm.CursoId == cursoId
-                              select cm.Id).FirstOrDefault();
             //Agarro el cursoMateria que deseo eliminar y lo elimino
-            var cursoMateria = await _context.CursoMateria.FindAsync(idEliminar);
+            var cursoMateria = _context.CursoMateria.Where(x => x.MateriaId == materiaId && x.CursoId == cursoId).FirstOrDefault();
+            if(cursoMateria == null)
+            {
+                return NotFound();
+            }
             _context.CursoMateria.Remove(cursoMateria);
             await _context.SaveChangesAsync();
             //Vuelvo a la vista de Details de Cursos
@@ -156,7 +212,10 @@ namespace MVCBasico12D.Controllers
             {
                 return NotFound();
             }
-
+            var materia = _context.Materia.Where(x => x.Id == cursoMateria.MateriaId).FirstOrDefault();
+            var curso = _context.Curso.Where(x => x.Id == cursoMateria.CursoId).FirstOrDefault();
+            ViewBag.Materia = materia;
+            ViewBag.Curso = curso;
             return View(cursoMateria);
         }
 

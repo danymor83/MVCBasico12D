@@ -22,7 +22,11 @@ namespace MVCBasico12D.Controllers
         {
             if (invalid != null)
             {
-                ViewBag.JavaScriptFunction = string.Format("usuarioInvalido();");
+                ViewBag.Erro = "display: inline; color:red;";
+            }
+            else
+            {
+                ViewBag.Erro = "display: none;";
             }
             return View();
         }

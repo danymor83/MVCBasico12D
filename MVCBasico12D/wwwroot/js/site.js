@@ -14,6 +14,16 @@ function asignarAlumno() {
     document.getElementById("cursoId").value = cursoId;
 }
 
+function idAlumno() {
+    const alumnoId = document.getElementById("alumnos").value;
+    document.getElementById("alumnoId").value = alumnoId;
+}
+
+function idMateria() {
+    const materiaId = document.getElementById("materias").value;
+    document.getElementById("materiaId").value = materiaId;
+}
+
 function asignarMateria() {
     const materiaId = document.getElementById("materias").value;
     document.getElementById("materiaId").value = materiaId;
@@ -74,5 +84,27 @@ function validarFormPersona() {
         return true;
     }
     return false;
+}
 
+function asignarCurso() {
+    const cursoId = document.getElementById("cursos").value;
+    document.getElementById("cursoId").value = cursoId;
+}
+
+function agarrarMateria() {
+    const materiaId = document.getElementById("materias").value;
+    document.getElementById("materiaId").value = materiaId;
+}
+
+function pageAlumno() {
+    document.getElementById("pageAlumno").submit();
+}
+
+function inicio() {
+    document.getElementById("inicio").submit();
+}
+
+function pageMateria(id) {
+    document.getElementById("materiaId").value = id;
+    document.getElementById("page").submit();
 }

@@ -1,13 +1,13 @@
 ﻿@model IEnumerable<MVCBasico12D.Models.CursoAlumno>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Asignar alumno a curso";
 }
 
-<h1>Index</h1>
+<h1>Alumnos por curso</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create">Asignar alumno a curso</a>
 </p>
 <table class="table">
     <thead>
@@ -16,7 +16,13 @@
                 @Html.DisplayNameFor(model => model.AlumnoId)
             </th>
             <th>
+                Alumno
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.CursoId)
+            </th>
+            <th>
+                Curso
             </th>
             <th></th>
         </tr>
@@ -28,15 +34,38 @@
             <td>
                 @Html.DisplayFor(modelItem => item.AlumnoId)
             </td>
+            @if (ViewBag.Alumnos != null)
+            {
+                foreach (Alumno alumno in ViewBag.Alumnos)
+                {
+                    if (alumno.Id == item.AlumnoId)
+                    {
+                        <td>
+                            @alumno.Nombre @alumno.Apellido
+                        </td>
+                    }
+                }
+            }
             <td>
                 @Html.DisplayFor(modelItem => item.CursoId)
             </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+                @if (ViewBag.Cursos != null)
+                {
+                    foreach (Curso curso in ViewBag.Cursos)
+                    {
+                        if (curso.Id == item.CursoId)
+                        {
+                        <td>
+                            @curso.Sigla
+                        </td>
+                    }
+                }
+            }
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Editar</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Eliminar</a>
+                </td>
+            </tr>
 }
     </tbody>
 </table>

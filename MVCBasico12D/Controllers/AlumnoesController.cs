@@ -42,7 +42,7 @@ namespace MVCBasico12D.Controllers
                             join a in _context.Alumno on ca.AlumnoId equals alumno.Id
                             where a.Id == alumno.Id
                             orderby m.Nombre ascending
-                            select m.Nombre).ToList();
+                            select m).ToList();
             ViewBag.Materias = materias;
            
             if (alumno == null)
@@ -59,10 +59,7 @@ namespace MVCBasico12D.Controllers
             var alumno = await _context.Alumno
                 .FirstOrDefaultAsync(m => m.Id == id);
             //traer materias del alumno
-            int materiaId = (from m in _context.Materia
-                             join cm in _context.CursoMateria on m.Id equals cm.MateriaId
-                             where m.Nombre == nombre
-                             select m.Id).FirstOrDefault();
+            int materiaId = Convert.ToInt32(nombre);
             var materias = (from m in _context.Materia
                             join cm in _context.CursoMateria on m.Id equals cm.MateriaId
                             join c in _context.Curso on cm.CursoId equals c.Id
@@ -70,10 +67,10 @@ namespace MVCBasico12D.Controllers
                             join a in _context.Alumno on ca.AlumnoId equals id
                             where a.Id == id
                             orderby m.Nombre ascending
-                            select m.Nombre).ToList();
+                            select m).ToList();
             ViewBag.Materia = (from m in _context.Materia
                                where m.Id == materiaId
-                               select m.Nombre).FirstOrDefault();
+                               select m).FirstOrDefault();
             ViewBag.Materias = materias;
             return View(alumno);
         }
@@ -164,10 +161,12 @@ namespace MVCBasico12D.Controllers
             {
                 try
                 {
+                    var mismoAlumno = _context.Alumno.Where(x => x.Id == id).FirstOrDefault();
                     var alum = _context.Usuarios.Where(x => x.Login == alumno.Dni).FirstOrDefault();                    
-                    if(alum == null || alum.Login == alumno.Dni)
+                    if(alum == null || alum.Login == mismoAlumno.Dni)
                     {
                         _context.Update(alumno);
+                        _context.Update(alum);
                         await _context.SaveChangesAsync();
                     }
                 }

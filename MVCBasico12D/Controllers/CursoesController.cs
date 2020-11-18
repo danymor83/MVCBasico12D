@@ -47,7 +47,7 @@ namespace MVCBasico12D.Controllers
                            join ca in _context.CursoAlumno on a.Id equals ca.AlumnoId
                            where ca.CursoId == id
                            orderby a.Apellido ascending
-                           select new { a.Dni, a.Nombre, a.Apellido }).ToList();
+                           select a).ToList();
             ViewBag.Alumnos = alumnos;
 
             //Busco las materias asignadas al curso correspondiente y las mando a la vista por el ViewBag
@@ -55,7 +55,7 @@ namespace MVCBasico12D.Controllers
                            join cm in _context.CursoMateria on m.Id equals cm.MateriaId
                            where cm.CursoId == id
                            orderby m.Nombre ascending
-                            select new { m.Id, m.Nombre, m.Anio }).ToList();
+                            select m).ToList();
             ViewBag.Materias = materias;
             return View(curso);
         }

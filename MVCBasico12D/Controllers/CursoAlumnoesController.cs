@@ -22,6 +22,35 @@ namespace MVCBasico12D.Controllers
         // GET: CursoAlumnoes
         public async Task<IActionResult> Index()
         {
+            var cursos = (from c in _context.Curso
+                          orderby c.Sigla ascending
+                          select c).ToList();
+            var alumnos = (from a in _context.Alumno
+                           orderby a.Nombre ascending
+                           select a).ToList();
+            var cursosAlumnos = (from ca in _context.CursoAlumno
+                                 select ca).ToList();
+            List<Alumno> alumnosConCurso = new List<Alumno>();
+            foreach(Alumno alumno in alumnos)
+            {
+                bool pertenece = false;
+                int i = 0;
+                while (i < cursos.Count && !pertenece)
+                {
+                    int j = 0;
+                    while(j < cursosAlumnos.Count && !pertenece)
+                    {
+                        if(alumno.Id == cursosAlumnos.ElementAt(j).AlumnoId && cursos.ElementAt(i).Id == cursosAlumnos.ElementAt(j).CursoId){
+                            alumnosConCurso.Add(alumno);
+                            pertenece = true;
+                        }
+                        j++;
+                    }
+                    i++;                    
+                }                                
+            }
+            ViewBag.Alumnos = alumnosConCurso;
+            ViewBag.Cursos = cursos;
             return View(await _context.CursoAlumno.ToListAsync());
         }
 
@@ -63,6 +92,7 @@ namespace MVCBasico12D.Controllers
 
             ViewBag.Alumnos = alumnosSinCurso;
             ViewBag.Cursos = cursos;
+            ViewBag.Erro = "display: none;";
             return View();
         }
 
@@ -81,6 +111,7 @@ namespace MVCBasico12D.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            ViewBag.Erro = "display: inline; color:red;";
             return View(cursoAlumno);
         }
 
@@ -97,6 +128,11 @@ namespace MVCBasico12D.Controllers
             {
                 return NotFound();
             }
+            var alumno = _context.Alumno.Where(x => x.Id == cursoAlumno.AlumnoId).FirstOrDefault();            
+            var cursos = (from c in _context.Curso
+                         select c).ToList();
+            ViewBag.Alumno = alumno;
+            ViewBag.Cursos = cursos;            
             return View(cursoAlumno);
         }
 
@@ -134,18 +170,14 @@ namespace MVCBasico12D.Controllers
             }
             return View(cursoAlumno);
         }
-        public async Task<IActionResult> Remover(String alumnoId, int cursoId)
+        public async Task<IActionResult> Remover(int alumnoId, int cursoId)
         {
-            //Con el DNI del alumno, busco su ID
-            var idAlumno = (from a in _context.Alumno
-                            where a.Dni == alumnoId
-                            select a.Id).FirstOrDefault();
-            //Busco el ID del cursoAlumno que deseo eliminar, usando el ID de alumno y el ID de curso
-            var idEliminar = (from ca in _context.CursoAlumno
-                              where ca.AlumnoId == idAlumno && ca.CursoId == cursoId
-                              select ca.Id).FirstOrDefault();
             //Agarro el cursoAlumno que deseo eliminar y lo elimino
-            var cursoAlumno = await _context.CursoAlumno.FindAsync(idEliminar);
+            var cursoAlumno = _context.CursoAlumno.Where(x => x.AlumnoId == alumnoId && x.CursoId == cursoId).FirstOrDefault();
+            if(cursoAlumno == null)
+            {
+                return NotFound();
+            }
             _context.CursoAlumno.Remove(cursoAlumno);
             await _context.SaveChangesAsync();
             //Vuelvo a la vista de Details de Cursos
@@ -165,7 +197,10 @@ namespace MVCBasico12D.Controllers
             {
                 return NotFound();
             }
-
+            var alumno = _context.Alumno.Where(x => x.Id == cursoAlumno.AlumnoId).FirstOrDefault();
+            var curso = _context.Curso.Where(x => x.Id == cursoAlumno.CursoId).FirstOrDefault();
+            ViewBag.Alumno = alumno;
+            ViewBag.Curso = curso;
             return View(cursoAlumno);
         }
 

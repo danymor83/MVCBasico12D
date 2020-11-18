@@ -166,10 +166,12 @@ namespace MVCBasico12D.Controllers
             {
                 try
                 {
+                    var mismoProfe = _context.Profesor.Where(x => x.Id == id).FirstOrDefault();
                     var profe = _context.Usuarios.Where(x => x.Login == profesor.Dni).FirstOrDefault();
-                    if (profe == null || profe.Login == profesor.Dni)
+                    if (profe == null || profe.Login == mismoProfe.Dni)
                     {
                         _context.Update(profesor);
+                        _context.Update(profe);
                         await _context.SaveChangesAsync();
                     }                    
                 }

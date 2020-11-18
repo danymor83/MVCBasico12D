@@ -1,12 +1,12 @@
 ﻿@model MVCBasico12D.Models.MateriaProfesor
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Editar";
 }
 
-<h1>Edit</h1>
+<h1>Editar</h1>
 
-<h4>MateriaProfesor</h4>
+<h4>Materia por profesor</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -14,24 +14,34 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
             <div class="form-group">
-                <label asp-for="ProfesorId" class="control-label"></label>
-                <input asp-for="ProfesorId" class="form-control" />
+                <label class="control-label">@ViewBag.Profesor.Nombre @ViewBag.Profesor.Apellido</label>
+                <input asp-for="ProfesorId" type="hidden" class="form-control" />
                 <span asp-validation-for="ProfesorId" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="MateriaId" class="control-label"></label>
-                <input asp-for="MateriaId" class="form-control" />
+                <select id="materias">
+                    @if (ViewBag.Materias != null)
+                    {
+                        foreach (Materia m in ViewBag.Materias)
+                        {
+                            <option value=@m.Id>@m.Nombre @m.Anio</option>
+                        }
+                    }
+                </select>
+                <input asp-for="MateriaId" id="materiaId" type="hidden" class="form-control" />
                 <span asp-validation-for="MateriaId" class="text-danger"></span>
             </div>
+            <label style="@ViewBag.Erro">Inválido!</label>
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <input type="submit" value="Guardar" onclick="agarrarMateria()" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
 
+<script src="~/js/site.js"></script>
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">Volver a la lista</a>
 </div>
 
 @section Scripts {

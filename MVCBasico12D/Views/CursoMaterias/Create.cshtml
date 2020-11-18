@@ -1,12 +1,12 @@
 ﻿@model MVCBasico12D.Models.CursoMateria
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Asignar materia a curso";
 }
 
-<h1>Create</h1>
+<h1>Asignar materia a curso</h1>
 
-<h4>CursoMateria</h4>
+<h4>Materias por curso</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -40,6 +40,9 @@
                 <input asp-for="CursoId" id="cursoId" type="hidden" class="form-control" />
             </div>
             <div class="form-group">
+                <label style="@ViewBag.Erro">Materia ya asignada al curso</label>
+            </div>
+            <div class="form-group">
                 <input type="submit" value="Asignar" onclick="asignarMateria()" class="btn btn-primary" />
             </div>
         </form>
@@ -49,7 +52,7 @@
 <script src="~/js/site.js"></script>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">Volver a la lista</a>
 </div>
 
 @section Scripts {

@@ -22,6 +22,36 @@ namespace MVCBasico12D.Controllers
         // GET: MateriaProfesors
         public async Task<IActionResult> Index()
         {
+            var materias = (from m in _context.Materia
+                          orderby m.Nombre ascending
+                          select m).ToList();
+            var profesores = (from p in _context.Profesor
+                           orderby p.Nombre ascending
+                           select p).ToList();
+            var materiaProfesores = (from mp in _context.MateriaProfesor
+                                 select mp).ToList();
+            List<Profesor> profesorConMateria = new List<Profesor>();
+            foreach (Profesor profesor in profesores)
+            {
+                bool pertenece = false;
+                int i = 0;
+                while (i < materias.Count && !pertenece)
+                {
+                    int j = 0;
+                    while (j < materiaProfesores.Count && !pertenece)
+                    {
+                        if (profesor.Id == materiaProfesores.ElementAt(j).ProfesorId && materias.ElementAt(i).Id == materiaProfesores.ElementAt(j).MateriaId)
+                        {
+                            profesorConMateria.Add(profesor);
+                            pertenece = true;
+                        }
+                        j++;
+                    }
+                    i++;
+                }
+            }
+            ViewBag.Profesores = profesorConMateria;
+            ViewBag.Materias = materias;
             return View(await _context.MateriaProfesor.ToListAsync());
         }
 
@@ -75,6 +105,7 @@ namespace MVCBasico12D.Controllers
             }
             ViewBag.Profesores = profesSinMateria;
             ViewBag.Materias = materiasSinProfe;
+            ViewBag.Erro = "display: none;";
             return View();
         }
 
@@ -92,6 +123,36 @@ namespace MVCBasico12D.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            var profesores = (from p in _context.Profesor
+                              select p).ToList();
+            List<Profesor> profesSinMateria = new List<Profesor>();
+            foreach (Profesor p in profesores)
+            {
+                MateriaProfesor profe = null;
+                profe = _context.MateriaProfesor.Where(m => m.ProfesorId == p.Id)
+                 .FirstOrDefault();
+                if (profe == null)
+                {
+                    profesSinMateria.Add(p);
+                }
+            }
+            var materias = (from m in _context.Materia
+                            orderby m.Nombre ascending
+                            select m).ToList();
+            List<Materia> materiasSinProfe = new List<Materia>();
+            foreach (Materia m in materias)
+            {
+                MateriaProfesor mate = null;
+                mate = _context.MateriaProfesor.Where(x => x.MateriaId == m.Id)
+                 .FirstOrDefault();
+                if (mate == null)
+                {
+                    materiasSinProfe.Add(m);
+                }
+            }
+            ViewBag.Profesores = profesSinMateria;
+            ViewBag.Materias = materiasSinProfe;
+            ViewBag.Erro = "display: inline; color:red;";
             return View(materiaProfesor);
         }
 
@@ -108,6 +169,23 @@ namespace MVCBasico12D.Controllers
             {
                 return NotFound();
             }
+            var profesor = _context.Profesor.Where(x => x.Id == materiaProfesor.ProfesorId).FirstOrDefault();
+            var materias = (from m in _context.Materia
+                            select m).ToList();
+            List<Materia> materiasSinProfe = new List<Materia>();
+            foreach (Materia m in materias)
+            {
+                MateriaProfesor mate = null;
+                mate = _context.MateriaProfesor.Where(x => x.MateriaId == m.Id)
+                 .FirstOrDefault();
+                if (mate == null)
+                {
+                    materiasSinProfe.Add(m);
+                }
+            }
+            ViewBag.Profesor = profesor;
+            ViewBag.Materias = materiasSinProfe;
+            ViewBag.Erro = "display: none;";
             return View(materiaProfesor);
         }
 
@@ -143,6 +221,7 @@ namespace MVCBasico12D.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            ViewBag.Erro = "display: inline; color:red;";
             return View(materiaProfesor);
         }
 
@@ -178,7 +257,10 @@ namespace MVCBasico12D.Controllers
             {
                 return NotFound();
             }
-
+            var profesor = _context.Profesor.Where(x => x.Id == materiaProfesor.ProfesorId).FirstOrDefault();
+            var materia = _context.Materia.Where(x => x.Id == materiaProfesor.MateriaId).FirstOrDefault();
+            ViewBag.Profesor = profesor;
+            ViewBag.Materia = materia;
             return View(materiaProfesor);
         }
 

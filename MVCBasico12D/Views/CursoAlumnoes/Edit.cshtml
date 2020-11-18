@@ -4,9 +4,9 @@
     ViewData["Title"] = "Edit";
 }
 
-<h1>Edit</h1>
+<h1>Editar</h1>
 
-<h4>CursoAlumno</h4>
+<h4>Alumno por curso</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -14,24 +14,33 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
             <div class="form-group">
-                <label asp-for="AlumnoId" class="control-label"></label>
-                <input asp-for="AlumnoId" class="form-control" />
+                <label class="control-label">@ViewBag.Alumno.Nombre @ViewBag.Alumno.Apellido</label>
+                <input asp-for="AlumnoId" type="hidden" class="form-control" />
                 <span asp-validation-for="AlumnoId" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="CursoId" class="control-label"></label>
-                <input asp-for="CursoId" class="form-control" />
+                <select id="cursos">
+                    @if(ViewBag.Cursos != null)
+                    {
+                        foreach(Curso c in ViewBag.Cursos)
+                        {
+                            <option value=@c.Id>@c.Sigla</option>
+                        }
+                    }
+                </select>
+                <input asp-for="CursoId" id="cursoId" type="hidden" class="form-control" />
                 <span asp-validation-for="CursoId" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <input type="submit" value="Guardar" onclick="asignarCurso()" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
 
+<script src="~/js/site.js"></script>
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">Volver a la lista</a>
 </div>
 
 @section Scripts {
