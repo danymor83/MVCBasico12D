@@ -22,9 +22,9 @@
                 <form asp-action="paginaCurso" id="page" method="post">
                     @if (ViewBag.Cursos != null)
                     {
-                        @foreach (var nw in ViewBag.Cursos)
+                        @foreach (Curso curso in ViewBag.Cursos)
                         {
-                            <a class="nav-link text-dark" id="@nw" onclick="pageCurso(this.id)">@nw</a>
+                            <a class="nav-link text-dark" id="@curso.Id" onclick="pageCurso(this.id)">@curso.Sigla</a>
                         }
                         <input asp-for="Id" id="profesorId" type="hidden" value=@Model.Id class="form-control" />
                         <input asp-for="Nombre" id="cursoId" type="hidden" class="form-control" />
@@ -39,13 +39,4 @@
         <li id="Salir"><a id="salir" href="#" onclick="salir()">Salir</a></li>
     </ul>
     <script src="~/js/site.js"></script>
-    <script>
-        function pageCurso(id) {
-            document.getElementById("cursoId").value = id;
-            document.getElementById("page").submit();
-        }
-        function pageProfesor() {
-            document.getElementById("pageProfesor").submit();
-        }
-    </script>
 </body>

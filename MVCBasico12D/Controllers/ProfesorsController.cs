@@ -40,7 +40,7 @@ namespace MVCBasico12D.Controllers
                           join p in _context.Profesor on mp.ProfesorId equals profe.Id
                           where p.Id == profe.Id
                           orderby c.Sigla ascending
-                          select c.Sigla).ToList();
+                          select c).ToList();
             ViewBag.Cursos = cursos;
 
             if (profe == null)
@@ -63,11 +63,14 @@ namespace MVCBasico12D.Controllers
                           join p in _context.Profesor on mp.ProfesorId equals profe.Id
                           where p.Id == profe.Id
                           orderby c.Sigla ascending
-                          select c.Sigla).ToList();
+                          select c).ToList();
             ViewBag.Cursos = cursos;
 
             //Sigla del curso actual
-            ViewBag.Curso = nombre;
+            var cursoId = Convert.ToInt32(nombre);
+            ViewBag.Curso = (from c in _context.Curso
+                             where c.Id == cursoId
+                             select c.Sigla).FirstOrDefault();
 
             int materiaId = (from m in _context.Materia
                              join mp in _context.MateriaProfesor on m.Id equals mp.MateriaId

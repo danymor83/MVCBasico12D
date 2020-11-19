@@ -96,8 +96,17 @@ function agarrarMateria() {
     document.getElementById("materiaId").value = materiaId;
 }
 
+function agarrarProfesor() {
+    const profesorId = document.getElementById("profesores").value;
+    document.getElementById("profesorId").value = profesorId;
+}
+
 function pageAlumno() {
     document.getElementById("pageAlumno").submit();
+}
+
+function pageProfesor() {
+    document.getElementById("pageProfesor").submit();
 }
 
 function inicio() {
@@ -106,5 +115,10 @@ function inicio() {
 
 function pageMateria(id) {
     document.getElementById("materiaId").value = id;
+    document.getElementById("page").submit();
+}
+
+function pageCurso(id) {
+    document.getElementById("cursoId").value = id;
     document.getElementById("page").submit();
 }

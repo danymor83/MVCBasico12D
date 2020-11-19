@@ -22,6 +22,12 @@ namespace MVCBasico12D.Controllers
         // GET: Notas
         public async Task<IActionResult> Index()
         {
+            var alumnos = (from a in _context.Alumno
+                           select a).ToList();
+            var materias = (from m in _context.Materia
+                           select m).ToList();
+            ViewBag.Alumnos = alumnos;
+            ViewBag.Materias = materias;
             return View(await _context.Nota.ToListAsync());
         }
         public async Task<IActionResult> Alumno(int alumnoId)

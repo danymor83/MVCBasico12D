@@ -1,10 +1,10 @@
 ﻿@model MVCBasico12D.Models.Materia
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalles";
 }
 
-<h1>Details</h1>
+<h1>Detalles</h1>
 
 <div>
     <h4>Materia</h4>
@@ -28,10 +28,17 @@
 
             @*Creo una Select List dinamica con los profesores correspondientes a la materia*@
             <dd class="col-sm-10">
-                @Html.DropDownList("profesores",
-                new SelectList(ViewBag.Profesores))
-                <input type="submit" id="btnRemover" value="Remover profesor" onclick="dniProfesor()" />
-                <input asp-for="Nombre" id="dni" type="hidden" class="form-control" />
+                <select id="profesores">
+                    @if (ViewBag.Profesores != null)
+                    {
+                        foreach (Profesor p in ViewBag.Profesores)
+                        {
+                            <option value=@p.Id>@p.Nombre @p.Apellido</option>
+                        }
+                    }
+                </select>
+                <input type="submit" id="btnRemover" value="Remover profesor" onclick="agarrarProfesor()" />
+                <input asp-for="Nombre" id="profesorId" type="hidden" class="form-control" />
                 <input asp-for="Id" id="materias" type="hidden" class="form-control" value="@Model.Id" />
             </dd>
         </dl>
@@ -39,6 +46,6 @@
     </div>
 <script src="~/js/site.js"></script>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Editar</a> |
+    <a asp-action="Index">Volver a la lista</a>
 </div>

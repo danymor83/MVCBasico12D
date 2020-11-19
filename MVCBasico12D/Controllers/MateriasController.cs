@@ -45,7 +45,7 @@ namespace MVCBasico12D.Controllers
                            join mp in _context.MateriaProfesor on p.Id equals mp.ProfesorId
                            where mp.MateriaId == id
                            orderby p.Apellido ascending
-                           select new { p.Dni, p.Nombre, p.Apellido }).ToList();
+                           select p).ToList();
             ViewBag.Profesores = profesores;
             return View(materia);
         }

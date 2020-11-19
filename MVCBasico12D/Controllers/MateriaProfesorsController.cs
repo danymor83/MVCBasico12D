@@ -183,6 +183,10 @@ namespace MVCBasico12D.Controllers
                     materiasSinProfe.Add(m);
                 }
             }
+
+            var materiaActual = _context.Materia.Where(x => x.Id == materiaProfesor.MateriaId).FirstOrDefault();
+            materiasSinProfe.Add(materiaActual);
+
             ViewBag.Profesor = profesor;
             ViewBag.Materias = materiasSinProfe;
             ViewBag.Erro = "display: none;";
@@ -225,15 +229,11 @@ namespace MVCBasico12D.Controllers
             return View(materiaProfesor);
         }
 
-        public async Task<IActionResult> Remover(String profesorId, int materiaId)
+        public async Task<IActionResult> Remover(int profesorId, int materiaId)
         {
-            //Con el DNI del profesor, busco su ID
-            var idProfesor = (from p in _context.Profesor
-                            where p.Dni == profesorId
-                              select p.Id).FirstOrDefault();
             //Busco el ID del materiaProfesor que deseo eliminar, usando el ID de profesor y el ID de materia
             var idEliminar = (from mp in _context.MateriaProfesor
-                              where mp.ProfesorId == idProfesor && mp.MateriaId == materiaId
+                              where mp.ProfesorId == profesorId && mp.MateriaId == materiaId
                               select mp.Id).FirstOrDefault();
             //Agarro el materiaProfesor que deseo eliminar y lo elimino
             var materiaProfesor = await _context.MateriaProfesor.FindAsync(idEliminar);
