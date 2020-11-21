@@ -22,15 +22,19 @@ namespace MVCBasico12D.Controllers
         // GET: CursoMaterias
         public async Task<IActionResult> Index()
         {
+            //Agarra todos los cursos
             var cursos = (from c in _context.Curso
                           orderby c.Sigla ascending
                           select c).ToList();
+            //Agarra todas la materias
             var materias = (from m in _context.Materia
                            orderby m.Nombre ascending
                            select m).ToList();
+            //Agarra todas las relaciones entre cursos y materias
             var cursosMaterias = (from cm in _context.CursoMateria
                                  select cm).ToList();
             List<Materia> materiasConCurso = new List<Materia>();
+            //Filtra las materias, dejando unicamente aquellas que esten asignadas a algun curso
             foreach (Materia materia in materias)
             {
                 bool pertenece = false;
@@ -76,12 +80,15 @@ namespace MVCBasico12D.Controllers
         // GET: CursoMaterias/Create
         public IActionResult Create()
         {
+            //Agarra todas las materias
             var materias = (from m in _context.Materia
                             orderby m.Nombre ascending
                             select m).ToList();
+            //Agarra todos los cursos
             var cursos = (from c in _context.Curso
                           orderby c.Sigla ascending
                           select c).ToList();
+            //Envia todo a la view Create
             ViewBag.Materias = materias;
             ViewBag.Cursos = cursos;
             ViewBag.Erro = "display: none;";
@@ -97,6 +104,7 @@ namespace MVCBasico12D.Controllers
         {
            if (ModelState.IsValid)
             {
+                //Valida que la materia no este asignada al curso, buscando una relacion entre ese curso y esa materia en la BD
                 var cursoMat = _context.CursoMateria.Where(x => x.CursoId == cursoMateria.CursoId && x.MateriaId == cursoMateria.MateriaId).FirstOrDefault();
                 if(cursoMat == null)
                 {
@@ -105,6 +113,7 @@ namespace MVCBasico12D.Controllers
                     return RedirectToAction(nameof(Index));
                 }               
             }
+           //En caso de ya existir, vuelve a la view Create con toda la información necesaria y disponibiliza el mensaje de error
             var materias = (from m in _context.Materia
                             orderby m.Nombre ascending
                             select m).ToList();
@@ -125,14 +134,18 @@ namespace MVCBasico12D.Controllers
                 return NotFound();
             }
 
+            //Trae la relación entre curso y materia que se desea editar
             var cursoMateria = await _context.CursoMateria.FindAsync(id);
             if (cursoMateria == null)
             {
                 return NotFound();
             }
+            //Trae la materia de la relación
             var materia = _context.Materia.Where(x => x.Id == cursoMateria.MateriaId).FirstOrDefault();
+            //Trae todos los cursos
             var cursos = (from c in _context.Curso
                           select c).ToList();
+            //Envia todo a la view Edit
             ViewBag.Materia = materia;
             ViewBag.Curso = cursos;
             ViewBag.Erro = "display: none;";
@@ -155,6 +168,7 @@ namespace MVCBasico12D.Controllers
             {
                 try
                 {
+                    //Valida que el nuevo curso no tenga, previamente, la materia que se desea asignar
                     var cursoMat = _context.CursoMateria.Where(x => x.CursoId == cursoMateria.CursoId && x.MateriaId == cursoMateria.MateriaId).FirstOrDefault();
                     if(cursoMat == null)
                     {
@@ -175,6 +189,7 @@ namespace MVCBasico12D.Controllers
                     }
                 }                
             }
+            //En caso de ser invalido, vuelve a la view Edit con la información necesaria
             var materia = _context.Materia.Where(x => x.Id == cursoMateria.MateriaId).FirstOrDefault();
             var cursos = (from c in _context.Curso
                           select c).ToList();
@@ -194,7 +209,7 @@ namespace MVCBasico12D.Controllers
             }
             _context.CursoMateria.Remove(cursoMateria);
             await _context.SaveChangesAsync();
-            //Vuelvo a la vista de Details de Cursos
+            //Vuelvo a la view Details de Cursos
             return RedirectToAction("Details", "Cursoes", new { id = cursoId });
         }
 
@@ -205,13 +220,14 @@ namespace MVCBasico12D.Controllers
             {
                 return NotFound();
             }
-
+            //Busca la relación entre curso y materia que se desea eliminar
             var cursoMateria = await _context.CursoMateria
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (cursoMateria == null)
             {
                 return NotFound();
             }
+            //Envia toda su información a la view de confirmación
             var materia = _context.Materia.Where(x => x.Id == cursoMateria.MateriaId).FirstOrDefault();
             var curso = _context.Curso.Where(x => x.Id == cursoMateria.CursoId).FirstOrDefault();
             ViewBag.Materia = materia;
@@ -224,6 +240,7 @@ namespace MVCBasico12D.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            //Eliminar la relación entre curso y materia del id correspondiente
             var cursoMateria = await _context.CursoMateria.FindAsync(id);
             _context.CursoMateria.Remove(cursoMateria);
             await _context.SaveChangesAsync();

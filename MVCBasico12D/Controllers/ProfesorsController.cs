@@ -22,18 +22,21 @@ namespace MVCBasico12D.Controllers
         // GET: Profesors
         public async Task<IActionResult> Index()
         {
+            //Trae la lista de todos los profesores y lo manda a la view Index
             return View(await _context.Profesor.ToListAsync());
         }
 
         public async Task<IActionResult> Notas(int id)
         {
+            //Redirecciona al Action Profesor de NotasController enviando el ID del respectivo profesor
             return RedirectToAction("Profesor", "Notas", new { alumnoId = id });
         }
         public async Task<IActionResult> Inicio(String dni)
         {
-            // 7 - Trae al profe de la BD con el dni correspondiente
+            //Trae al profe de la BD con el dni correspondiente
             var profe = await _context.Profesor
                 .FirstOrDefaultAsync(m => m.Dni == dni);
+            //Trae todos los cursos deste profesor
             var cursos = (from c in _context.Curso
                           join cm in _context.CursoMateria on c.Id equals cm.CursoId
                           join mp in _context.MateriaProfesor on cm.MateriaId equals mp.MateriaId                            
@@ -47,16 +50,17 @@ namespace MVCBasico12D.Controllers
             {
                 return NotFound();
             }
-            // 8 - Llama a la vista inicial de profe y pasa al respectivo profe como parametro
+            //Llama a la vista inicial de profe y envia toda la información
             return View(profe);
         }
 
         [HttpPost]
         public async Task<IActionResult> paginaCurso(int id, String nombre)
         {
+            //Busca el profesor
             var profe = await _context.Profesor
                 .FirstOrDefaultAsync(m => m.Id == id);
-            //traer cursos del profe
+            //Busca los cursos del profe
             var cursos = (from c in _context.Curso
                           join cm in _context.CursoMateria on c.Id equals cm.CursoId
                           join mp in _context.MateriaProfesor on cm.MateriaId equals mp.MateriaId
@@ -66,21 +70,22 @@ namespace MVCBasico12D.Controllers
                           select c).ToList();
             ViewBag.Cursos = cursos;
 
-            //Sigla del curso actual
+            //Busca la sigla del curso actual
             var cursoId = Convert.ToInt32(nombre);
             ViewBag.Curso = (from c in _context.Curso
                              where c.Id == cursoId
                              select c.Sigla).FirstOrDefault();
-
+            //Busca el ID de la materia relacionada al profesor
             int materiaId = (from m in _context.Materia
                              join mp in _context.MateriaProfesor on m.Id equals mp.MateriaId
                              join p in _context.Profesor on mp.ProfesorId equals profe.Id
                              where p.Id == profe.Id
                              select m.Id).FirstOrDefault();
-            //Materia actual
+            //Busca la materia
             ViewBag.Materia = (from m in _context.Materia
                                where m.Id == materiaId
                                select m.Nombre).FirstOrDefault();
+            //Envia todo a la view paginaCurso
             return View(profe);
         }
 
@@ -91,7 +96,7 @@ namespace MVCBasico12D.Controllers
             {
                 return NotFound();
             }
-
+            //Busca el profesor que se desea conocer sus detalles
             var profesor = await _context.Profesor
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (profesor == null)
@@ -105,6 +110,7 @@ namespace MVCBasico12D.Controllers
         // GET: Profesors/Create
         public IActionResult Create()
         {
+            //Envia el codigo que hace invisible el mensaje de error en la view Create
             ViewBag.Erro = "display: none;";
             return View();
         }
@@ -118,9 +124,11 @@ namespace MVCBasico12D.Controllers
         {
             if (ModelState.IsValid)
             {
+                //Verifica que el DNI del profesor que se quiere crear no exista previamente
                 var profe = _context.Usuarios.Where(x => x.Login == profesor.Dni).FirstOrDefault();
                 if(profe == null)
                 {
+                    //En caso de no existir, se crea el nuevo profesor y un usuario para el mismo
                     _context.Add(profesor);
                     await _context.SaveChangesAsync();
                     Usuario user = new Usuario();
@@ -132,6 +140,7 @@ namespace MVCBasico12D.Controllers
                     return RedirectToAction(nameof(Index));
                 }                
             }
+            //En caso de ya existir, disponibiliza un mensaje de error y vuelve a la view Create
             ViewBag.Erro = "display: inline; color:red;";
             return View(profesor);
         }
@@ -143,7 +152,7 @@ namespace MVCBasico12D.Controllers
             {
                 return NotFound();
             }
-
+            //Busca al profesor que se desea editar
             var profesor = await _context.Profesor.FindAsync(id);
             if (profesor == null)
             {
@@ -169,13 +178,16 @@ namespace MVCBasico12D.Controllers
             {
                 try
                 {
+                    //Verifica que el nuevo DNI ingresado sea del mismo profesor o que no coincida con el de otro
                     var mismoProfe = _context.Profesor.Where(x => x.Id == id).FirstOrDefault();
                     var profe = _context.Usuarios.Where(x => x.Login == profesor.Dni).FirstOrDefault();
                     if (profe == null || profe.Login == mismoProfe.Dni)
                     {
+                        //En caso de ser el DNI del mismo profesor o no coincidir con el de otro, se actualizan sus datos
                         _context.Update(profesor);
                         _context.Update(profe);
                         await _context.SaveChangesAsync();
+                        return RedirectToAction(nameof(Index));
                     }                    
                 }
                 catch (DbUpdateConcurrencyException)
@@ -189,8 +201,8 @@ namespace MVCBasico12D.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
             }
+            //En caso de ser un DNI invalido, vuelve a la view Editar y disponibiliza el mensaje de error
             ViewBag.Erro = "display: inline; color:red;";
             return View(profesor);
         }
@@ -202,7 +214,7 @@ namespace MVCBasico12D.Controllers
             {
                 return NotFound();
             }
-
+            //Busca el profesor que se desea eliminar y manda su información a la página de confirmación
             var profesor = await _context.Profesor
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (profesor == null)

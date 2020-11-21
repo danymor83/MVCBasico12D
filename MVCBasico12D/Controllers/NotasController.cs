@@ -22,10 +22,13 @@ namespace MVCBasico12D.Controllers
         // GET: Notas
         public async Task<IActionResult> Index()
         {
+            //Trae todos los alumnos
             var alumnos = (from a in _context.Alumno
                            select a).ToList();
+            //Trae todas las materias
             var materias = (from m in _context.Materia
                            select m).ToList();
+            //Envia todo a la view Index
             ViewBag.Alumnos = alumnos;
             ViewBag.Materias = materias;
             return View(await _context.Nota.ToListAsync());
@@ -36,7 +39,7 @@ namespace MVCBasico12D.Controllers
                         join a in _context.Alumno on n.AlumnoId equals a.Id
                         where a.Id == alumnoId
                         select n).FirstOrDefault();
-
+            //Agarra las materias relacionadas al curso del alumno
             var materias = (from m in _context.Materia
                             join cm in _context.CursoMateria on m.Id equals cm.MateriaId
                             join c in _context.Curso on cm.CursoId equals c.Id
@@ -46,12 +49,13 @@ namespace MVCBasico12D.Controllers
                             orderby m.Id ascending
                             select m).ToList();
             ViewBag.Materias = materias;
-
+            //Agarra las notas del alumno
             var notas = (from n in _context.Nota
                          join a in _context.Alumno on n.AlumnoId equals a.Id
                          where a.Id == alumnoId
                          orderby n.MateriaId ascending
                          select n).ToList();
+            //Envia todo al view Alumno, donde muestra todas las calificaciones del alumno
             ViewBag.Notas = notas;
             ViewBag.Context = _context;
             return View(nota);
@@ -59,6 +63,7 @@ namespace MVCBasico12D.Controllers
 
         public async Task<IActionResult> InicioAlumno(int alumnoId)
         {
+            //Recibe el ID del alumno y lo manda a la pagina inicial del alumno
             var alumno = await _context.Alumno
                 .FirstOrDefaultAsync(m => m.Id == alumnoId);
             return RedirectToAction("Inicio", "Alumnoes", new { dni = alumno.Dni });
@@ -66,17 +71,18 @@ namespace MVCBasico12D.Controllers
 
         public async Task<IActionResult> Profesor(int alumnoId)
         {
+            //Agarra el profesor
             var profe = await _context.Profesor
                 .FirstOrDefaultAsync(m => m.Id == alumnoId);
             ViewBag.Profesor = profe;
-
+            //Agarra la materia asignada al profesor
             var materia = (from m in _context.Materia
                            join mp in _context.MateriaProfesor on m.Id equals mp.MateriaId
                            join p in _context.Profesor on mp.ProfesorId equals profe.Id
                            where p.Id == profe.Id
                            select m).FirstOrDefault();
             ViewBag.Materia = materia;
-
+            //Agarra los cursos del profesor
             var cursos = (from c in _context.Curso
                           join cm in _context.CursoMateria on c.Id equals cm.CursoId
                           join mp in _context.MateriaProfesor on cm.MateriaId equals mp.MateriaId
@@ -85,7 +91,7 @@ namespace MVCBasico12D.Controllers
                           select c).ToList();
             ViewBag.Cursos = cursos;
 
-
+            //Agarra los alumnos de los cursos del profesor
             var alumnos = (from a in _context.Alumno
                                 join ca in _context.CursoAlumno on a.Id equals ca.AlumnoId
                                 join cm in _context.CursoMateria on ca.CursoId equals cm.CursoId
@@ -94,11 +100,11 @@ namespace MVCBasico12D.Controllers
                                 orderby a.Id ascending
                                 select a).ToList();
             ViewBag.Alumnos = alumnos;
-
+            //Agarra todas las relaciones entre curso y alumno
             var cursoAlumnos = (from ca in _context.CursoAlumno
                                  select ca).ToList();
             ViewBag.CursoAlumnos = cursoAlumnos;
-
+            //Agarra todas las notas de los alumnos que cursan la materia en cuestion
             var notas = (from n in _context.Nota
                                 join al in _context.Alumno on n.AlumnoId equals al.Id
                                 where n.MateriaId == materia.Id
@@ -106,11 +112,13 @@ namespace MVCBasico12D.Controllers
                                  orderby n.Cuatrimestre ascending
                                  select n).ToList();
             ViewBag.Notas = notas;
+            //Se envia todo a la View Profesor = Calificaciones, donde el profesor sube las notas de sus alumnos y las modifica
             return View();
         }
 
         public async Task<IActionResult> InicioProfesor(int alumnoId)
         {
+            //Agarra al profesor que se desea y vuelve a la pantalla inicial del mismo
             var profesor = await _context.Profesor
                 .FirstOrDefaultAsync(m => m.Id == alumnoId);
             return RedirectToAction("Inicio", "Profesors", new { dni = profesor.Dni });
@@ -118,10 +126,12 @@ namespace MVCBasico12D.Controllers
 
         public async Task<IActionResult> ActualizarNota(int id, int nota1, int cuatrimestre, int alumnoId, int materiaId)
         {
+            //Busca la nota que se desea actualizar
             var nota = await _context.Nota
                 .FirstOrDefaultAsync(m => m.AlumnoId == alumnoId && m.MateriaId == materiaId && m.Cuatrimestre == cuatrimestre);
             if(nota == null)
             {
+                //En caso de no existir, se crea una nueva nota y se la inserta en la BD
                 Nota nuevaNota = new Nota();
                 nuevaNota.AlumnoId = alumnoId;
                 nuevaNota.MateriaId = materiaId;
@@ -134,6 +144,7 @@ namespace MVCBasico12D.Controllers
             {
                 try
                 {
+                    //En caso de existir, se actualiza la nota en cuestion
                     nota.Nota1 = nota1;
                     _context.Update(nota);
                     await _context.SaveChangesAsync();
@@ -150,6 +161,7 @@ namespace MVCBasico12D.Controllers
                     }
                 }
             }
+            //Vuelve a la view Profesor
             return RedirectToAction("Profesor", "Notas", new { alumnoId = id });
         }
 
@@ -251,7 +263,7 @@ namespace MVCBasico12D.Controllers
             {
                 return NotFound();
             }
-
+            //Agarra la nota que se desea eliminar y manda sus datos a la pagina de confirmacion
             var nota = await _context.Nota
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (nota == null)
@@ -267,6 +279,7 @@ namespace MVCBasico12D.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            //Se borra la nota del respectivo ID
             var nota = await _context.Nota.FindAsync(id);
             _context.Nota.Remove(nota);
             await _context.SaveChangesAsync();

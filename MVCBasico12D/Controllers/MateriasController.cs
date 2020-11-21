@@ -22,6 +22,7 @@ namespace MVCBasico12D.Controllers
         // GET: Materias
         public async Task<IActionResult> Index()
         {
+            //Envia una lista con todas las materias a la view Index
             return View(await _context.Materia.ToListAsync());
         }
 
@@ -32,7 +33,7 @@ namespace MVCBasico12D.Controllers
             {
                 return NotFound();
             }
-
+            //Trae la materia que se desea ver los detalles
             var materia = await _context.Materia
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (materia == null)
@@ -53,6 +54,7 @@ namespace MVCBasico12D.Controllers
         // GET: Materias/Create
         public IActionResult Create()
         {
+            ViewBag.Erro = "display: none;";
             return View();
         }
 
@@ -65,6 +67,7 @@ namespace MVCBasico12D.Controllers
         {            
             if (ModelState.IsValid)
             {
+                //Valido que la materia creada no exista previamente
                 var mat = _context.Materia.Where(x => x.Nombre == materia.Nombre && x.Anio == materia.Anio).FirstOrDefault();
                 if (mat == null)
                 {
@@ -73,6 +76,8 @@ namespace MVCBasico12D.Controllers
                     return RedirectToAction(nameof(Index));
                 }                
             }
+            //En caso de ser invalido, disponibilizo el mensaje de error
+            ViewBag.Erro = "display: inline; color:red;";
             return View(materia);
         }
 
@@ -83,12 +88,13 @@ namespace MVCBasico12D.Controllers
             {
                 return NotFound();
             }
-
+            //Trae la materia que se desea editar
             var materia = await _context.Materia.FindAsync(id);
             if (materia == null)
             {
                 return NotFound();
             }
+            ViewBag.Erro = "display: none;";
             return View(materia);
         }
 
@@ -108,8 +114,16 @@ namespace MVCBasico12D.Controllers
             {
                 try
                 {
-                    _context.Update(materia);
-                    await _context.SaveChangesAsync();
+                    //Valido que los nuevos datos de la materia no coinciadn con otra materia
+                    //En caso de ser valido, actualizo sus valores
+                    var mismaMat = _context.Materia.Where(x => x.Id == id).FirstOrDefault();
+                    var mat = _context.Materia.Where(x => x.Nombre == materia.Nombre && x.Anio == materia.Anio).FirstOrDefault();
+                    if(mat == null || mat == mismaMat)
+                    {
+                        _context.Update(materia);
+                        await _context.SaveChangesAsync();
+                        return RedirectToAction(nameof(Index));
+                    }                    
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -122,8 +136,9 @@ namespace MVCBasico12D.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
             }
+            //En caso de ser invalido, disponibilizo el mensaje de error
+            ViewBag.Erro = "display: inline; color:red;";
             return View(materia);
         }
 
@@ -134,7 +149,7 @@ namespace MVCBasico12D.Controllers
             {
                 return NotFound();
             }
-
+            //Agarro la materia que deseo eliminar
             var materia = await _context.Materia
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (materia == null)
@@ -177,7 +192,9 @@ namespace MVCBasico12D.Controllers
         [HttpPost]
         public async Task<IActionResult> RemoverProfesor([Bind("Id,Nombre,Anio")] Materia materia)
         {
+            //Recibe el ID del profesor de la relacion materia profesor que deseo eliminar
             int profId = Convert.ToInt32(materia.Nombre);
+            //Envio el ID del profesor y el ID de la materia de la relación materia profesor que deseo eliminar al Action Remover de MateriaProfesorsController
             return RedirectToAction("Remover", "MateriaProfesors", new { profesorId = profId, materiaId = materia.Id });
         }
     }

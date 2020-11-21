@@ -15,8 +15,9 @@
             <input type="hidden" asp-for="Id" />
             <div class="form-group">
                 <label asp-for="Sigla" class="control-label"></label>
-                <input asp-for="Sigla" class="form-control" required/>
+                <input asp-for="Sigla" class="form-control" required />
                 <span asp-validation-for="Sigla" class="text-danger"></span>
+                <label style="@ViewBag.Erro">Información inválida!</label>
             </div>
             <div class="form-group">
                 <input type="submit" value="Guardar" class="btn btn-primary" />

@@ -22,6 +22,7 @@ namespace MVCBasico12D.Controllers
         // GET: Cursoes
         public async Task<IActionResult> Index()
         {
+            //Trae la lista de todos los cursos y lo envia a la view Index
             return View(await _context.Curso.ToListAsync());
         }
         
@@ -34,6 +35,7 @@ namespace MVCBasico12D.Controllers
                 return NotFound();
             }
 
+            //Agarra el curso que se desea conocer los detalles
             var curso = await _context.Curso
                 .FirstOrDefaultAsync(m => m.Id == id);
            
@@ -63,6 +65,8 @@ namespace MVCBasico12D.Controllers
         // GET: Cursoes/Create
         public IActionResult Create()
         {
+            //Envia el codigo para dejar el mensaje de error invisible en la view Create
+            ViewBag.Erro = "display: none;";
             return View();
         }
 
@@ -75,6 +79,7 @@ namespace MVCBasico12D.Controllers
         {
             if (ModelState.IsValid)
             {
+                //Valida que la sigla del nuevo curso no exista en la BD
                 var curs = _context.Curso.Where(x => x.Sigla == curso.Sigla).FirstOrDefault();
                 if (curs == null)
                 {
@@ -83,6 +88,8 @@ namespace MVCBasico12D.Controllers
                     return RedirectToAction(nameof(Index));
                 }                
             }
+            //En caso de existir un curso con la sigla recibida, se disponibiliza el mensaje de error
+            ViewBag.Erro = "display: inline; color:red;";
             return View(curso);
         }
 
@@ -93,12 +100,14 @@ namespace MVCBasico12D.Controllers
             {
                 return NotFound();
             }
-
+            //Agarra el curso que se desea editar
             var curso = await _context.Curso.FindAsync(id);
             if (curso == null)
             {
                 return NotFound();
             }
+            //Envia el codigo para dejar el mensaje de error invisible en la view Edit
+            ViewBag.Erro = "display: none;";
             return View(curso);
         }
 
@@ -118,8 +127,17 @@ namespace MVCBasico12D.Controllers
             {
                 try
                 {
-                    _context.Update(curso);
-                    await _context.SaveChangesAsync();
+                    //Valida que la sigla recibida sea del mismo curso y no de otro
+                    //En caso de la sigla ser diferente, verifica que no sea una sigla ya existente en la BD
+                    //En caso de no existir, se actualiza la sigla del curso
+                    var mismoCurso = _context.Curso.Where(x => x.Id == id).FirstOrDefault();
+                    var curs = _context.Curso.Where(x => x.Sigla == curso.Sigla).FirstOrDefault();
+                    if(curs == null || curso.Sigla == mismoCurso.Sigla)
+                    {
+                        _context.Update(curso);
+                        await _context.SaveChangesAsync();
+                        return RedirectToAction(nameof(Index));
+                    }                    
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -132,8 +150,9 @@ namespace MVCBasico12D.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
             }
+            //En el caso de la sigla ser invalida, vuelve a la view Edit y disponibiliza el mensaje de error
+            ViewBag.Erro = "display: inline; color:red;";
             return View(curso);
         }
 
@@ -144,7 +163,7 @@ namespace MVCBasico12D.Controllers
             {
                 return NotFound();
             }
-
+            //Agarra el curso que se desea eliminar y lo envia a la view Delete donde se confirma la baja o se cancela
             var curso = await _context.Curso
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (curso == null)
@@ -187,14 +206,18 @@ namespace MVCBasico12D.Controllers
         [HttpPost]
         public async Task<IActionResult> RemoverAlumno([Bind("Id,Sigla")] Curso curso)
         {
+            //Recibe el id del alumno que se desea eliminar del curso y el id del curso
             int alumId = Convert.ToInt32(curso.Sigla);
+            //Redirecciona al Action Remover del Controller CursoAlumnoes, donde se dará debaja la relación
             return RedirectToAction("Remover", "CursoAlumnoes", new{ alumnoId = alumId, cursoId = curso.Id });            
         }
 
         [HttpPost]
         public async Task<IActionResult> RemoverMateria([Bind("Id,Sigla")] Curso curso)
         {
+            //Recibe el id de la materia que se desea eliminar del curso y el id del curso
             int matId = Convert.ToInt32(curso.Sigla);
+            //Redirecciona al Action Remover del Controller CursoMaterias, donde se dará debaja la relación
             return RedirectToAction("Remover", "CursoMaterias", new { materiaId = matId, cursoId = curso.Id });
         }
     }
