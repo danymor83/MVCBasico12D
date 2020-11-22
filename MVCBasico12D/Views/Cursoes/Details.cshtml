@@ -22,10 +22,17 @@
 
             @*Creo una Select List dinamica con los alumnos correspondientes al curso*@
             <dd class="col-sm-10">
-                @Html.DropDownList("alumnos",
-                new SelectList(ViewBag.Alumnos))
-                <input type="submit" id="btnRemover" value="Remover alumno" onclick="dniAlumno()" />
-                <input asp-for="Sigla" id="dni" type="hidden" class="form-control" />
+                <select id="alumnos">
+                    @if (ViewBag.Alumnos != null)
+                    {
+                        foreach (Alumno a in ViewBag.Alumnos)
+                        {
+                            <option value=@a.Id>@a.Nombre @a.Apellido</option>
+                        }
+                    }
+                </select>
+                <input type="submit" id="btnRemover" value="Remover alumno" onclick="idAlumno()" />
+                <input asp-for="Sigla" id="alumnoId" type="hidden" class="form-control" />
                 <input asp-for="Id" id="cursos" type="hidden" class="form-control" value="@Model.Id" />
             </dd>
         </dl>
@@ -35,8 +42,15 @@
         <dl class="row">
             @*Creo una Select List dinamica con las materias correspondientes al curso*@
             <dd class="col-sm-10">
-                @Html.DropDownList("materias",
-                new SelectList(ViewBag.Materias))
+                <select id="materias">
+                    @if (ViewBag.Materias != null)
+                    {
+                        foreach (Materia m in ViewBag.Materias)
+                        {
+                            <option value=@m.Id>@m.Nombre @m.Anio</option>
+                        }
+                    }
+                </select>
                 <input type="submit" id="btnRemover" value="Remover materia" onclick="idMateria()" />
                 <input asp-for="Sigla" id="materiaId" type="hidden" class="form-control" />
                 <input asp-for="Id" id="cursos" type="hidden" class="form-control" value="@Model.Id" />
@@ -46,6 +60,6 @@
     </div>
 <script src="~/js/site.js"></script>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Editar</a> |
+    <a asp-action="Index">Volver a la lista</a>
 </div>

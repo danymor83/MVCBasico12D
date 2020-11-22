@@ -68,7 +68,7 @@
                                     {
                                         for(int i = cont; i < 3; i++)
                                         {
-                                            <td contenteditable="false">0</td>
+                                            <td contenteditable="false">-</td>
                                         }
                                     }
 
@@ -133,7 +133,6 @@
             document.getElementById("pageProfesor").submit();
         }
         function actualizar(id) {
-            alert(id);
             form = document.getElementById(id);
             var cuatri;
             var alumId;
@@ -146,8 +145,6 @@
                     alumId = oChild.value;
                 }
             }
-            alert(cuatri);
-            alert(alumId);
             for (i = 0; i < form.childNodes.length; i++) {
                 oChild = form.childNodes[i];
                 if (oChild.id == "cuatrimestre") {

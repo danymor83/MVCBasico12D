@@ -22,19 +22,24 @@ namespace MVCBasico12D.Controllers
         // GET: Alumnoes
         public async Task<IActionResult> Index()
         {
+            //Trae la lista de todos los alumnos y lo envia a la view Index
             return View(await _context.Alumno.ToListAsync());
         }
 
+        //Redirecciona el usuario a la pagina de calificaciones, enviando el ID del alumno correspondiente
         public async Task<IActionResult> Notas(int id)
         {
             return RedirectToAction("Alumno", "Notas", new { alumnoId = id});
         }
 
+        //Recibe el DNI del alumno, trae toda su información de la BD y las materias de su curso
+        //Luego envia todo a la View Inicio
         public async Task<IActionResult> Inicio(String dni)
         {
-            // 7 - Trae al alumno de la BD con el dni correspondiente
+            //Trae al alumno de la BD con su DNI
             var alumno = await _context.Alumno
                 .FirstOrDefaultAsync(m => m.Dni == dni);
+            //Trae las materias del alumno de la BD 
             var materias = (from m in _context.Materia
                             join cm in _context.CursoMateria on m.Id equals cm.MateriaId
                             join c in _context.Curso on cm.CursoId equals c.Id
@@ -42,27 +47,27 @@ namespace MVCBasico12D.Controllers
                             join a in _context.Alumno on ca.AlumnoId equals alumno.Id
                             where a.Id == alumno.Id
                             orderby m.Nombre ascending
-                            select m.Nombre).ToList();
+                            select m).ToList();
             ViewBag.Materias = materias;
            
             if (alumno == null)
             {
                 return NotFound();
             }
-            // 8 - Llama a la vista inicial de alumno y pasa al respectivo alumno como parametro
+            //Llama a la vista inicial de alumno y pasa al respectivo alumno como parametro
             return View(alumno);
         }
 
+        //Recibe el id del alumno y el id de la materia que se desea acceder
+        //Se envia todo a la view paginaMateria
         [HttpPost]
         public async Task<IActionResult> paginaMateria(int id, String nombre)
         {
+            //Trae al alumno de la BD con su ID
             var alumno = await _context.Alumno
                 .FirstOrDefaultAsync(m => m.Id == id);
-            //traer materias del alumno
-            int materiaId = (from m in _context.Materia
-                             join cm in _context.CursoMateria on m.Id equals cm.MateriaId
-                             where m.Nombre == nombre
-                             select m.Id).FirstOrDefault();
+            //Trae las materias del alumno
+            int materiaId = Convert.ToInt32(nombre);
             var materias = (from m in _context.Materia
                             join cm in _context.CursoMateria on m.Id equals cm.MateriaId
                             join c in _context.Curso on cm.CursoId equals c.Id
@@ -70,10 +75,11 @@ namespace MVCBasico12D.Controllers
                             join a in _context.Alumno on ca.AlumnoId equals id
                             where a.Id == id
                             orderby m.Nombre ascending
-                            select m.Nombre).ToList();
+                            select m).ToList();
+            //Trae la materia que se desea acceder
             ViewBag.Materia = (from m in _context.Materia
                                where m.Id == materiaId
-                               select m.Nombre).FirstOrDefault();
+                               select m).FirstOrDefault();
             ViewBag.Materias = materias;
             return View(alumno);
         }
@@ -86,6 +92,7 @@ namespace MVCBasico12D.Controllers
                 return NotFound();
             }
 
+            //Trae el alumno que se desea conocer los detalles y se lo envia a la view Details
             var alumno = await _context.Alumno
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (alumno == null)
@@ -99,6 +106,8 @@ namespace MVCBasico12D.Controllers
         // GET: Alumnoes/Create
         public IActionResult Create()
         {
+            //Envia el codigo para dejar el mensaje de error invisible en la view Create
+            ViewBag.Erro = "display: none;";
             return View();
         }
 
@@ -111,16 +120,24 @@ namespace MVCBasico12D.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(alumno);
-                await _context.SaveChangesAsync();
-                Usuario user = new Usuario();
-                user.Tipo = 1;
-                user.Login = alumno.Dni;
-                user.Password = alumno.Nombre.ToLower();
-                _context.Add(user);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                //Busca en la BD un alumno que ya exista con el DNI que se desea crear el nuevo alumno                
+                var alum = _context.Usuarios.Where(x => x.Login == alumno.Dni).FirstOrDefault();
+                //En caso de no existir, se agrega el nuevo alumno y se crea un nuevo usuario de alumno
+                if(alum == null)
+                {
+                    _context.Add(alumno);
+                    await _context.SaveChangesAsync();
+                    Usuario user = new Usuario();
+                    user.Tipo = 1;
+                    user.Login = alumno.Dni;
+                    user.Password = alumno.Nombre.ToLower();
+                    _context.Add(user);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
             }
+            //En caso de existir un alumno con el DNI recibido, se disponibiliza el mensaje de error
+            ViewBag.Erro = "display: inline; color:red;";
             return View(alumno);
         }
 
@@ -132,12 +149,14 @@ namespace MVCBasico12D.Controllers
             {
                 return NotFound();
             }
-
+            //Trae el alumno que se desea editar y se lo envia a la view Edit
             var alumno = await _context.Alumno.FindAsync(id);
             if (alumno == null)
             {
                 return NotFound();
             }
+            //Envia el codigo para dejar el mensaje de error invisible
+            ViewBag.Erro = "display: none;";
             return View(alumno);
         }
 
@@ -157,8 +176,18 @@ namespace MVCBasico12D.Controllers
             {
                 try
                 {
-                    _context.Update(alumno);
-                    await _context.SaveChangesAsync();
+                    //Valida que el DNI recibido sea del mismo alumno y no de otro
+                    //En caso del DNI ser diferente, verifica que no sea un DNI ya existente en la BD
+                    //En caso de no existir, se actualiza el DNI del alumno y de su usuario
+                    var mismoAlumno = _context.Alumno.Where(x => x.Id == id).FirstOrDefault();
+                    var alum = _context.Usuarios.Where(x => x.Login == alumno.Dni).FirstOrDefault();                    
+                    if(alum == null || alum.Login == mismoAlumno.Dni)
+                    {
+                        _context.Update(alumno);
+                        _context.Update(alum);
+                        await _context.SaveChangesAsync();
+                        return RedirectToAction(nameof(Index));
+                    }
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -170,9 +199,10 @@ namespace MVCBasico12D.Controllers
                     {
                         throw;
                     }
-                }
-                return RedirectToAction(nameof(Index));
+                }                
             }
+            //En el caso del DNI ser invalido, vuelve a la view Edit y disponibiliza el mensaje de error
+            ViewBag.Erro = "display: inline; color:red;";
             return View(alumno);
         }
 
@@ -184,6 +214,7 @@ namespace MVCBasico12D.Controllers
                 return NotFound();
             }
 
+            //Agarra el alumno que se desea eliminar y lo envia a la view Delete donde se confirma la baja o se cancela
             var alumno = await _context.Alumno
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (alumno == null)
@@ -199,7 +230,22 @@ namespace MVCBasico12D.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            //Busca las notas del alumno y las borra
+            var notas = _context.Nota.Where(x => x.AlumnoId == id).ToList();
+            if(notas != null)
+            {
+                _context.Nota.RemoveRange(notas);
+            }            
+            //Busca la relacion del alumno con su curso y lo borra
+            var cursoAlumno = _context.CursoAlumno.Where(x => x.AlumnoId == id).FirstOrDefault();
+            if(cursoAlumno != null)
+            {
+                _context.CursoAlumno.Remove(cursoAlumno);
+            }            
+            //Busca al alumno y lo borra de la tabla de alumnos y de la tabla de usuarios
             var alumno = await _context.Alumno.FindAsync(id);
+            var alumnoUser = _context.Usuarios.Where(x => x.Login == alumno.Dni).FirstOrDefault();
+            _context.Usuarios.Remove(alumnoUser);
             _context.Alumno.Remove(alumno);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));

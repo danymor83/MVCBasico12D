@@ -1,6 +1,6 @@
 ﻿@model MVCBasico12D.Models.Usuario;
 @{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Login";
     Layout = "";
 }
 @* 1 - PAGINA INICIAL - LOGIN *@
@@ -24,20 +24,8 @@
             <div name="miclave" id="miclave">@Html.TextBoxFor(u => u.Password, new { @class = "text", type = "password", required = "required" })</div>
             <input type="submit" id="btnAcceder" value="Acceder" />
             <br>
+            <label style="@ViewBag.Erro">Usuario y/o contraseña invalido(s)!</label>
         }
     </div>
-
-    <script type="text/javascript">
-        function usuarioInvalido() {
-            alert("Usuario y/o contraseña invalido(s)!");
-        };
-    </script>
-
-    @if (ViewBag.JavaScriptFunction != null)
-    {
-        <script type="text/javascript">
-         @Html.Raw(ViewBag.JavaScriptFunction);
-        </script>
-    }
 </body>
 </html>

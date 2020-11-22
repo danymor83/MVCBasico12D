@@ -1,6 +1,4 @@
-﻿@import "compass/css3";
-
-td {
+﻿td {
     text-align: center;
 }
 
@@ -12,33 +10,17 @@ th {
 
 .table-editable {
     position: relative;
-    .glyphicon
-
-{
-    font-size: 20px;
-}
-
 }
 
 .table-remove {
     color: #700;
     cursor: pointer;
-    &:hover
-
-{
-    color: #f00;
-}
 
 }
 
 .table-up, .table-down {
     color: #007;
     cursor: pointer;
-    &:hover
-
-{
-    color: #00f;
-}
 
 }
 
@@ -48,9 +30,4 @@ th {
     position: absolute;
     top: 8px;
     right: 0;
-    &:hover
-
-{
-    color: #0b0;
-}
 }

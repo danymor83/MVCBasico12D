@@ -22,20 +22,21 @@ namespace MVCBasico12D.Controllers
         // GET: Usuarios
         public async Task<IActionResult> Index()
         {
+            //Envia la lista de todos los usuarios a la view Index
             return View(await _context.Usuarios.ToListAsync());
         }
 
         [HttpPost]
-        public async Task<IActionResult> Validar(Usuario usuario) // 3 - Recibe un Usuario por el metodo POST
+        public async Task<IActionResult> Validar(Usuario usuario) //Recibe un Usuario por el metodo POST
         {
-            // 4 - asgino los valores del Usuario para hacer una consulta en la base de datos
+            //Asgino los valores del Usuario para hacer una consulta en la base de datos
             string login = usuario.Login;
             string pass = usuario.Password;
             var user = (from u in _context.Usuarios
                    where u.Login == login && u.Password == pass
                    select u).FirstOrDefault<Usuario>();
 
-            // 5 - Valido que exista el usuario, y en caso positivo, valido el tipo de usuario
+            //Valido que no exista el usuario, y en caso de no existir, valido el tipo de usuario
             if (user != null)
             {
                 if(user.Tipo == 0) //ADMIN
@@ -44,17 +45,17 @@ namespace MVCBasico12D.Controllers
                 }
                 else if (user.Tipo == 1) //ALUMNO
                 {
-                    // 6 - Redirecciona al metodo Inicio de AlumnoesController
+                    //Redirecciona al Action Inicio de AlumnoesController
                     return RedirectToAction("Inicio", "Alumnoes",  new{dni = user.Login });
                 }
                 else //PROFESOR
                 {
-                    // 6 - Redirecciona al metodo Inicio de ProfesorsController
+                    //Redirecciona al Action Inicio de ProfesorsController
                     return RedirectToAction("Inicio", "Profesors", new { dni = user.Login });
                 }
                    
             }
-            else //Vuelve a la pantalla de Login
+            else //Vuelve a la view Index = Pantalla de Login
             {
                 return RedirectToAction("Index", "Home", new { invalid = true });
             }
@@ -109,7 +110,7 @@ namespace MVCBasico12D.Controllers
             {
                 return NotFound();
             }
-
+            //Agarra al usuario que se desea editar
             var usuario = await _context.Usuarios.FindAsync(id);
             if (usuario == null)
             {
@@ -134,6 +135,7 @@ namespace MVCBasico12D.Controllers
             {
                 try
                 {
+                    //Actualiza el usuario en la BD
                     _context.Update(usuario);
                     await _context.SaveChangesAsync();
                 }
@@ -160,7 +162,7 @@ namespace MVCBasico12D.Controllers
             {
                 return NotFound();
             }
-
+            //Agarra la usuario que se desea eliminar
             var usuario = await _context.Usuarios
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (usuario == null)
@@ -176,6 +178,7 @@ namespace MVCBasico12D.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            //Elimina el usuario del id correspondiente
             var usuario = await _context.Usuarios.FindAsync(id);
             _context.Usuarios.Remove(usuario);
             await _context.SaveChangesAsync();

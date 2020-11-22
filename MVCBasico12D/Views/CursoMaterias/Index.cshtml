@@ -1,13 +1,13 @@
 ﻿@model IEnumerable<MVCBasico12D.Models.CursoMateria>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Asignar materia a curso";
 }
 
-<h1>Index</h1>
+<h1>Materias por curso</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create">Asignar materia a curso</a>
 </p>
 <table class="table">
     <thead>
@@ -16,7 +16,13 @@
                 @Html.DisplayNameFor(model => model.CursoId)
             </th>
             <th>
+                Curso
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.MateriaId)
+            </th>
+            <th>
+                Materia
             </th>
             <th></th>
         </tr>
@@ -27,15 +33,38 @@
             <td>
                 @Html.DisplayFor(modelItem => item.CursoId)
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.MateriaId)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+                @if (ViewBag.Cursos != null)
+                {
+                    foreach (Curso curso in ViewBag.Cursos)
+                    {
+                        if (curso.Id == item.CursoId)
+                        {
+                        <td>
+                            @curso.Sigla
+                        </td>
+                    }
+                }
+            }
+                <td>
+                    @Html.DisplayFor(modelItem => item.MateriaId)
+                </td>
+                    @if (ViewBag.Materias != null)
+                    {
+                        foreach (Materia materia in ViewBag.Materias)
+                        {
+                            if (materia.Id == item.MateriaId)
+                            {
+                            <td>
+                                @materia.Nombre @materia.Anio
+                            </td>
+                        }
+                    }
+                }
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id">Editar</a> |
+                        <a asp-action="Delete" asp-route-id="@item.Id">Eliminar</a>
+                    </td>
+                </tr>
 }
     </tbody>
 </table>

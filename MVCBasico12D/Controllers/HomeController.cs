@@ -20,9 +20,16 @@ namespace MVCBasico12D.Controllers
 
         public IActionResult Index(bool ? invalid)
         {
+            //Esta Action puede o no recibir un bool invalid
+            //En caso de recibir, disponibiliza el mensaje de error
+            //Recibe el invalid en caso del Login resultar invalido
             if (invalid != null)
             {
-                ViewBag.JavaScriptFunction = string.Format("usuarioInvalido();");
+                ViewBag.Erro = "display: inline; color:red;";
+            }
+            else
+            {
+                ViewBag.Erro = "display: none;";
             }
             return View();
         }
