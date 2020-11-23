@@ -195,7 +195,15 @@ namespace MVCBasico12D.Controllers
             //Recibe el ID del profesor de la relacion materia profesor que deseo eliminar
             int profId = Convert.ToInt32(materia.Nombre);
             //Envio el ID del profesor y el ID de la materia de la relación materia profesor que deseo eliminar al Action Remover de MateriaProfesorsController
-            return RedirectToAction("Remover", "MateriaProfesors", new { profesorId = profId, materiaId = materia.Id });
+            if(profId != 0)
+            {
+                return RedirectToAction("Remover", "MateriaProfesors", new { profesorId = profId, materiaId = materia.Id });
+            }
+            else
+            {
+                return RedirectToAction("Details", "Materias", new { id = materia.Id });
+            }
+            
         }
     }
 }

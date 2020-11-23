@@ -16,15 +16,6 @@ h1 {
     text-align: right;
     color: white;
 }
-
-#labelC {
-    padding-left: 2.5%;
-}
-
-#miclave {
-    margin-right: 2%;
-}
-
-#btnAcceder {
-    margin-right: 2%;
+body {
+    background: url('/images/schoolBG.jpg');
 }

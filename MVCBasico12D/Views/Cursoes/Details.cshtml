@@ -21,20 +21,20 @@
             </dd>
 
             @*Creo una Select List dinamica con los alumnos correspondientes al curso*@
-            <dd class="col-sm-10">
-                <select id="alumnos">
-                    @if (ViewBag.Alumnos != null)
+        <dd class="col-sm-10">
+            <select id="alumnos">
+                @if (ViewBag.Alumnos != null)
+                {
+                    foreach (Alumno a in ViewBag.Alumnos)
                     {
-                        foreach (Alumno a in ViewBag.Alumnos)
-                        {
-                            <option value=@a.Id>@a.Nombre @a.Apellido</option>
-                        }
+                        <option value=@a.Id>@a.Nombre @a.Apellido</option>
                     }
-                </select>
-                <input type="submit" id="btnRemover" value="Remover alumno" onclick="idAlumno()" />
-                <input asp-for="Sigla" id="alumnoId" type="hidden" class="form-control" />
-                <input asp-for="Id" id="cursos" type="hidden" class="form-control" value="@Model.Id" />
-            </dd>
+                }
+            </select>
+            <input type="submit" id="btnRemover" value="Remover alumno" onclick="idAlumno()" />
+            <input asp-for="Sigla" id="alumnoId" type="hidden" class="form-control" />
+            <input asp-for="Id" id="cursos" type="hidden" class="form-control" value="@Model.Id" />
+        </dd>
         </dl>
     }
     @using (Html.BeginForm("RemoverMateria", "Cursoes", FormMethod.Post))

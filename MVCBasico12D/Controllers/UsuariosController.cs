@@ -36,7 +36,7 @@ namespace MVCBasico12D.Controllers
                    where u.Login == login && u.Password == pass
                    select u).FirstOrDefault<Usuario>();
 
-            //Valido que no exista el usuario, y en caso de no existir, valido el tipo de usuario
+            //Valido que no exista el usuario, y en caso de existir, valido el tipo de usuario
             if (user != null)
             {
                 if(user.Tipo == 0) //ADMIN

@@ -155,8 +155,6 @@ namespace MVCBasico12D.Controllers
             {
                 return NotFound();
             }
-            //Envia el codigo para dejar el mensaje de error invisible
-            ViewBag.Erro = "display: none;";
             return View(alumno);
         }
 
@@ -176,18 +174,10 @@ namespace MVCBasico12D.Controllers
             {
                 try
                 {
-                    //Valida que el DNI recibido sea del mismo alumno y no de otro
-                    //En caso del DNI ser diferente, verifica que no sea un DNI ya existente en la BD
-                    //En caso de no existir, se actualiza el DNI del alumno y de su usuario
-                    var mismoAlumno = _context.Alumno.Where(x => x.Id == id).FirstOrDefault();
-                    var alum = _context.Usuarios.Where(x => x.Login == alumno.Dni).FirstOrDefault();                    
-                    if(alum == null || alum.Login == mismoAlumno.Dni)
-                    {
-                        _context.Update(alumno);
-                        _context.Update(alum);
-                        await _context.SaveChangesAsync();
-                        return RedirectToAction(nameof(Index));
-                    }
+                    //Hace un update en la tabla con los nuevos datos del profesor
+                    _context.Update(alumno);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -201,8 +191,6 @@ namespace MVCBasico12D.Controllers
                     }
                 }                
             }
-            //En el caso del DNI ser invalido, vuelve a la view Edit y disponibiliza el mensaje de error
-            ViewBag.Erro = "display: inline; color:red;";
             return View(alumno);
         }
 

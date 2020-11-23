@@ -209,7 +209,15 @@ namespace MVCBasico12D.Controllers
             //Recibe el id del alumno que se desea eliminar del curso y el id del curso
             int alumId = Convert.ToInt32(curso.Sigla);
             //Redirecciona al Action Remover del Controller CursoAlumnoes, donde se dará debaja la relación
-            return RedirectToAction("Remover", "CursoAlumnoes", new{ alumnoId = alumId, cursoId = curso.Id });            
+            if(alumId != 0)
+            {
+                return RedirectToAction("Remover", "CursoAlumnoes", new { alumnoId = alumId, cursoId = curso.Id });
+            }
+            else
+            {
+                return RedirectToAction("Details", "Cursoes", new { id = curso.Id });
+            }
+                        
         }
 
         [HttpPost]
@@ -218,7 +226,15 @@ namespace MVCBasico12D.Controllers
             //Recibe el id de la materia que se desea eliminar del curso y el id del curso
             int matId = Convert.ToInt32(curso.Sigla);
             //Redirecciona al Action Remover del Controller CursoMaterias, donde se dará debaja la relación
-            return RedirectToAction("Remover", "CursoMaterias", new { materiaId = matId, cursoId = curso.Id });
+            if(matId != 0)
+            {
+                return RedirectToAction("Remover", "CursoMaterias", new { materiaId = matId, cursoId = curso.Id });
+            }
+            else
+            {
+                return RedirectToAction("Details", "Cursoes", new { id = curso.Id });
+            }
+            
         }
     }
 }

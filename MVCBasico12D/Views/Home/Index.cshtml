@@ -18,7 +18,7 @@
         @* 2 - FORMULARIO DE LOGIN: Manda el valor de los inputs por parametro al UsuarioController *@
         @using (Html.BeginForm("Validar", "Usuarios", FormMethod.Post))
         {
-            <br><label for="minombre">Usuario: </label>
+            <br><label id="userLabel" for="minombre">Usuario: </label>
             <div name="minombre" id="minombre">@Html.TextBoxFor(u => u.Login, new { @class = "text", type = "text", required = "required" })</div>
             <label for="miclave" id="labelC"> Contraseña: </label>
             <div name="miclave" id="miclave">@Html.TextBoxFor(u => u.Password, new { @class = "text", type = "password", required = "required" })</div>

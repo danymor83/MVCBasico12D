@@ -158,7 +158,6 @@ namespace MVCBasico12D.Controllers
             {
                 return NotFound();
             }
-            ViewBag.Erro = "display: none;";
             return View(profesor);
         }
 
@@ -178,17 +177,10 @@ namespace MVCBasico12D.Controllers
             {
                 try
                 {
-                    //Verifica que el nuevo DNI ingresado sea del mismo profesor o que no coincida con el de otro
-                    var mismoProfe = _context.Profesor.Where(x => x.Id == id).FirstOrDefault();
-                    var profe = _context.Usuarios.Where(x => x.Login == profesor.Dni).FirstOrDefault();
-                    if (profe == null || profe.Login == mismoProfe.Dni)
-                    {
-                        //En caso de ser el DNI del mismo profesor o no coincidir con el de otro, se actualizan sus datos
-                        _context.Update(profesor);
-                        _context.Update(profe);
-                        await _context.SaveChangesAsync();
-                        return RedirectToAction(nameof(Index));
-                    }                    
+                    //Hace un update en la tabla con los nuevos datos del profesor
+                    _context.Update(profesor);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));                 
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -202,8 +194,6 @@ namespace MVCBasico12D.Controllers
                     }
                 }
             }
-            //En caso de ser un DNI invalido, vuelve a la view Editar y disponibiliza el mensaje de error
-            ViewBag.Erro = "display: inline; color:red;";
             return View(profesor);
         }
 

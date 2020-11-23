@@ -58,7 +58,19 @@ namespace MVCBasico12D.Controllers
             //Envia todo al view Alumno, donde muestra todas las calificaciones del alumno
             ViewBag.Notas = notas;
             ViewBag.Context = _context;
-            return View(nota);
+            if(materias.Count > 0)
+            {
+                return View(nota);
+            }
+            else
+            {
+                //En caso del alumno no tener niguna materia, vuelve a su view inicial
+                var dni = (from a in _context.Alumno
+                           where a.Id == alumnoId
+                           select a.Dni).FirstOrDefault();
+                return RedirectToAction("Inicio", "Alumnoes", new { dni = dni });
+            }
+            
         }
 
         public async Task<IActionResult> InicioAlumno(int alumnoId)
@@ -113,7 +125,19 @@ namespace MVCBasico12D.Controllers
                                  select n).ToList();
             ViewBag.Notas = notas;
             //Se envia todo a la View Profesor = Calificaciones, donde el profesor sube las notas de sus alumnos y las modifica
-            return View();
+            if(cursos.Count > 0)
+            {
+                return View();
+            }
+            else
+            {
+                //En el caso del profesor no tener ningun curso, vuelve a su view inicial
+                var dni = (from p in _context.Profesor
+                           where p.Id == alumnoId
+                           select p.Dni).FirstOrDefault();
+                return RedirectToAction("Inicio", "Profesors", new { dni = dni });
+            }
+            
         }
 
         public async Task<IActionResult> InicioProfesor(int alumnoId)
