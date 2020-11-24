@@ -6,16 +6,45 @@
 }
 
 h1 {
-    color: grey;
-    font-family: cursive;
+    color: beige;
+    font-family: sans-serif;
     text-align: center;
+    text-shadow: 2px 2px 4px #000000;
 }
 
 .ingreso {
-    background-color: grey;
+    background-color: #333;
     text-align: right;
     color: white;
 }
+
+#minombre {
+    margin-right: 2%;
+}
+
+#userLabel {
+    margin-right: 10.6%;
+}
+
+#labelC {
+    margin-right: 8.6%;
+}
+
+#Password {
+    margin-right: 2%;
+}
+
+#btnAcceder {
+    margin-right: 10.3%;
+    margin-top: 0.5%;
+    margin-bottom: 0.5%;
+}
+
 body {
-    background: url('/images/schoolBG.jpg');
+    background-image: url("../images/schoolBG.jpg");
+    no-repeat center fixed;
+    background-size: cover;
+    font-family: sans-serif;
+}
+
 }

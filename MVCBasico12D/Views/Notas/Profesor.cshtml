@@ -30,7 +30,7 @@
                 <span class="table-add glyphicon glyphicon-plus"></span>
                 @foreach (Curso curso in ViewBag.Cursos)
                 {
-                    <label>@curso.Sigla</label>
+                    <label class="siglaCursos">@curso.Sigla</label>
                     <table class="table">
                         <tr>
                             <th>Alumno</th>
@@ -86,7 +86,7 @@
             @foreach (Curso curso in ViewBag.Cursos)
             {
         <form asp-action="ActualizarNota" id=@curso.Id>
-            <label>@curso.Sigla</label>
+            <label class="siglaCursos">@curso.Sigla</label>
             <select name="alumnos" id="alumnos">
                 @foreach (Alumno alumno in ViewBag.Alumnos)
                 {

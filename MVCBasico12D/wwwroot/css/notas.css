@@ -2,6 +2,20 @@
     text-align: center;
 }
 
+#table{
+    text-align:center;
+}
+
+table {
+    background-color: beige;
+    margin: 0 auto;
+}
+
+.siglaCursos {
+    color: beige;
+    text-shadow: 2px 2px 4px #000000;
+}
+
 th {
     text-align: center;
     padding-left: 15px;

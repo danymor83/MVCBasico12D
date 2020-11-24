@@ -54,6 +54,8 @@
 
     h1 {
         text-align: center;
+        color: beige;
+        text-shadow: 2px 2px 4px #000000;
     }
 
     #Salir {
@@ -69,3 +71,14 @@
     th, td {
         padding: 15px;
     }
+
+body {
+    background-image: url("../images/schoolBG.jpg");
+    no-repeat center fixed;
+    background-size: cover;
+    font-family: sans-serif;
+}
+
+#inicio, #pageAlumno, #pageProfesor {
+    display: contents;
+}

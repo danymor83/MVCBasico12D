@@ -10,19 +10,13 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.AlumnoId)
-            </th>
-            <th>
                 Alumno
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.MateriaId)
             </th>
             <th>
                 Materia
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Nota1)
+                Nota
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Cuatrimestre)
@@ -33,9 +27,6 @@
     <tbody>
 @foreach (var item in Model) {
         <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.AlumnoId)
-            </td>
             @if (ViewBag.Alumnos != null)
             {
                 foreach (Alumno alumno in ViewBag.Alumnos)
@@ -48,9 +39,6 @@
                     }
                 }
             }
-            <td>
-                @Html.DisplayFor(modelItem => item.MateriaId)
-            </td>
             @if (ViewBag.Materias != null)
             {
                 foreach (Materia materia in ViewBag.Materias)
